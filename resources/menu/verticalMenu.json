@@ -1,0 +1,220 @@
+{
+  "menu": [
+    {
+      "name": "Dashboard Geral",
+      "icon": "bx bx-chart",
+      "url": "/admin/dashboard",
+      "slug": "admin-general-dashboard"
+    },
+    {
+      "name": "Gestão de Vendas",
+      "icon": "bx bx-cart-alt",
+      "slug": "sales-management",
+      "submenu": [
+        {
+          "name": "Dashboard de Clientes",
+          "icon": "bx bx-chart",
+          "url": "/admin/customers-dashboard",
+          "slug": "admin-customers-dashboard"
+        },
+        {
+          "name": "Dashboard de Vendas",
+          "icon": "bx bx-chart",
+          "url": "/admin/sales-dashboard",
+          "slug": "admin-sales-dashboard"
+        },
+        {
+          "name": "Lista de Vendas",
+          "icon": "bx bx-list-ul",
+          "url": "/sales",
+          "slug": "admin-sales-index"
+        }
+      ]
+    },
+    {
+      "name": "Gestão de Frota",
+      "icon": "bx bxs-truck",
+      "slug": "admin-fleet-management",
+      "submenu": [
+        {
+          "name": "Dashboard de Frota",
+          "url": "/admin/fleet-dashboard",
+          "icon": "bx bx-chart",
+          "slug": "admin-fleet-dashboard"
+        },
+        {
+          "name": "Agenda de Entregas",
+          "url": "/driver-schedules/all",
+          "icon": "bx bx-calendar-alt",
+          "slug": "driver-delivery-schedules"
+        },
+        {
+          "name": "Veículos",
+          "url": "/admin/vehicles",
+          "icon": "bx bxs-truck",
+          "slug": "admin-vehicles"
+        },
+        {
+          "name": "Motoristas",
+          "url": "/admin/drivers",
+          "icon": "bx bx-id-card",
+          "slug": "admin-drivers"
+        },
+        {
+          "name": "Uso de Veículos",
+          "url": "/admin/vehicle_usages",
+          "icon": "bx bx-car",
+          "slug": "admin-vehicle-usages"
+        },
+        {
+          "name": "Fornecedores",
+          "url": "/admin/suppliers",
+          "icon": "bx bx-briefcase",
+          "slug": "admin-suppliers"
+        },
+        {
+          "name": "Multas",
+          "url": "/admin/vehicle_fines",
+          "icon": "bx bx-receipt",
+          "slug": "admin-vehicle-fines"
+        },
+        {
+          "name": "Janelas de Entrega",
+          "url": "/admin/delivery_windows",
+          "icon": "bx bx-calendar",
+          "slug": "admin-delivery-windows"
+        },
+        {
+          "name": "Cargas Planejadas",
+          "url": "/admin/planned_shipments",
+          "icon": "bx bx-package",
+          "slug": "admin-planned-shipments"
+        }
+      ]
+    },
+    {
+      "name": "Montagens",
+      "icon": "bx bx-calendar-event",
+      "slug": "assembly-management",
+      "submenu": [
+        {
+          "name": "Agenda Geral",
+          "icon": "bx bx-calendar-alt",
+          "url": "/assembly-schedules/all",
+          "slug": "admin-assembly-schedules-all"
+        },
+        {
+          "name": "Dashboard de Montagem",
+          "icon": "bx bx-chart",
+          "url": "/admin/assembly-dashboard",
+          "slug": "admin-assembly-dashboard"
+        }
+      ]
+    },
+    {
+      "name": "CRM",
+      "icon": "bx bx-layout",
+      "slug": "crm-operations",
+      "submenu": [
+        {
+          "name": "Dashboard CRM",
+          "icon": "bx bx-chart",
+          "url": "/admin/crm/dashboard",
+          "slug": "crm.dashboard"
+        },
+        {
+          "name": "Leads",
+          "icon": "bx bx-filter",
+          "url": "/admin/crm/leads",
+          "slug": "crm.leads.index"
+        },
+        {
+          "name": "Pipeline de Vendas",
+          "icon": "bx bx-kanban",
+          "url": "/admin/crm/pipeline",
+          "slug": "crm.pipeline.index"
+        },
+        {
+          "name": "Agenda de Atividades",
+          "icon": "bx bx-calendar-check",
+          "url": "/admin/crm/activities/dashboard",
+          "slug": "crm.activities.dashboard"
+        },
+        {
+          "name": "Etapas do Funil",
+          "icon": "bx bx-list-check",
+          "url": "/admin/crm/settings/stages",
+          "slug": "crm.settings.stages.index"
+        }
+      ]
+    },
+    {
+      "menuHeader": "Cadastros"
+    },
+    {
+      "name": "Cadastros Gerais",
+      "icon": "bx bx-list-check",
+      "slug": "general-registrations",
+      "submenu": [
+        {
+          "name": "Clientes",
+          "icon": "bx bx-group",
+          "url": "/admin/customers",
+          "slug": "admin-customers"
+        },
+        {
+          "name": "Montadores",
+          "icon": "bx bx-wrench",
+          "url": "/admin/assemblers",
+          "slug": "admin-assemblers"
+        },
+        {
+          "name": "Vendedores",
+          "icon": "bx bx-user-pin",
+          "url": "/admin/crm/sellers",
+          "slug": "crm.sellers.index"
+        },
+        {
+          "name": "Arquitetos",
+          "icon": "bx bx-pencil",
+          "url": "/admin/crm/architects",
+          "slug": "crm.architects.index"
+        },
+        {
+          "name": "Parceiros",
+          "icon": "bx bx-briefcase-alt",
+          "url": "/admin/crm/partners",
+          "slug": "crm.partners.index"
+        }
+      ]
+    },
+    {
+      "menuHeader": "Configurações"
+    },
+    {
+      "name": "Configurações",
+      "icon": "bx bx-cog",
+      "slug": "admin-configurations",
+      "submenu": [
+        {
+          "name": "roles",
+          "url": "/admin/roles",
+          "icon": "bx bx-user-check",
+          "slug": "admin-roles"
+        },
+        {
+          "name": "permissions",
+          "url": "/admin/permissions",
+          "icon": "bx bx-check-shield",
+          "slug": "admin-permissions"
+        },
+        {
+          "name": "users",
+          "url": "/admin/users",
+          "icon": "bx bx-group",
+          "slug": "admin-users"
+        }
+      ]
+    }
+  ]
+}

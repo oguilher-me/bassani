@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'manage_users' => 'Gerenciar Usuários',
+    'users' => 'Usuários',
+    'add_new_user' => 'Adicionar Novo Usuário',
+    'name' => 'Nome',
+    'email' => 'Email',
+    'role' => 'Nível de Acesso',
+    'status' => 'Status',
+    'actions' => 'Ações',
+    'active' => 'Ativo',
+    'inactive' => 'Inativo',
+    'are_you_sure' => 'Você tem certeza?',
+    'create_user' => 'Criar Usuário',
+    'create_new_user' => 'Criar Novo Usuário',
+    'password' => 'Senha',
+    'confirm_password' => 'Confirmar Senha',
+    'select_role' => 'Selecionar Nível de Acesso',
+    'submit' => 'Enviar',
+    'cancel' => 'Cancelar',
+    'edit_user' => 'Editar Usuário',
+    'leave_empty_for_no_change' => 'Deixe em branco para não alterar',
+    'update' => 'Atualizar',
+    'user_details' => 'Detalhes do Usuário',
+    'name_colon' => 'Nome:',
+    'back_to_users' => 'Voltar para Usuários',
+];
