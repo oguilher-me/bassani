@@ -3,245 +3,482 @@
 @section('title', 'Recuperar Senha - Bassani Móveis')
 
 @section('page-style')
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* Forgot Password Page Custom Styles */
-    .auth-forgot-page {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #1F2A44;
         min-height: 100vh;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        overflow-x: hidden;
+    }
+
+    .auth-wrapper {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* Left Panel - Image Background */
+    .auth-decoration {
+        flex: 1.2;
         position: relative;
+        background-image: url('{{ asset("assets/img/backgrounds/loja-bassani.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 3rem;
         overflow: hidden;
     }
-    
-    .auth-forgot-page::before {
+
+    /* Gradient Overlay */
+    .auth-decoration::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
-        opacity: 0.5;
-        pointer-events: none;
+        background: linear-gradient(
+            to bottom,
+            rgba(31, 42, 68, 0.3) 0%,
+            rgba(31, 42, 68, 0.5) 30%,
+            rgba(31, 42, 68, 0.7) 60%,
+            rgba(31, 42, 68, 0.95) 100%
+        );
+        z-index: 1;
     }
-    
-    .auth-container {
-        min-height: 100vh;
+
+    /* Right Edge Mask - Smooth transition */
+    .auth-decoration::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 100%;
+        background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+        z-index: 2;
+    }
+
+    /* Decorative accent line */
+    .decoration-accent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, #DE0802 0%, #B3211A 50%, transparent 100%);
+        z-index: 3;
+    }
+
+    .decoration-content {
+        position: relative;
+        z-index: 4;
+        color: white;
+    }
+
+    .decoration-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(222, 8, 2, 0.9);
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .decoration-badge svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .decoration-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        line-height: 1.2;
+    }
+
+    .decoration-subtitle {
+        font-size: 1.1rem;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .decoration-features {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .feature-item svg {
+        width: 18px;
+        height: 18px;
+        color: #DE0802;
+    }
+
+    /* Right Panel - Form */
+    .auth-form-panel {
+        flex: 1;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem 4rem;
+        position: relative;
+    }
+
+    .auth-form-container {
+        width: 100%;
+        max-width: 380px;
+    }
+
+    .auth-logo-container {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-logo {
+        height: 60px;
+    }
+
+    .auth-welcome {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-welcome .icon-container {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, rgba(222, 8, 2, 0.1) 0%, rgba(179, 33, 26, 0.1) 100%);
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 2rem;
-        position: relative;
-        z-index: 1;
+        margin: 0 auto 1.25rem;
+        border: 2px solid rgba(222, 8, 2, 0.2);
     }
-    
-    .auth-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        overflow: hidden;
-        max-width: 420px;
+
+    .auth-welcome .icon-container svg {
+        width: 32px;
+        height: 32px;
+        color: #DE0802;
+    }
+
+    .auth-welcome h1 {
+        color: #1F2A44;
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-welcome p {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Form Styles */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-input {
         width: 100%;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .auth-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 2rem;
-        text-align: center;
-        color: white;
-        position: relative;
-    }
-    
-    .auth-header::after {
-        content: '';
-        position: absolute;
-        bottom: -20px;
-        left: 0;
-        right: 0;
-        height: 40px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 50% 50% 0 0;
-    }
-    
-    .auth-logo {
-        height: 80px;
-        margin-bottom: 1rem;
-        filter: brightness(0) invert(1);
-    }
-    
-    .auth-body {
-        padding: 2rem;
-    }
-    
-    .form-floating-custom {
-        position: relative;
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-floating-custom input {
-        width: 100%;
-        padding: 1rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
-        font-size: 1rem;
+        padding: 0.875rem 0.875rem 0.875rem 2.75rem;
+        border: 1.5px solid #D2D4DA;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
         transition: all 0.3s ease;
-        background: white;
+        background: #fafafa;
     }
-    
-    .form-floating-custom input:focus {
+
+    .form-input:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        border-color: #DE0802;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(222, 8, 2, 0.1);
     }
-    
-    .form-floating-custom label {
+
+    .form-input::placeholder {
+        color: #999;
+    }
+
+    .form-icon {
         position: absolute;
-        left: 1rem;
+        left: 0.875rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #6b7280;
+        color: #999;
+        transition: color 0.3s ease;
+    }
+
+    .form-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .form-group:focus-within .form-icon {
+        color: #DE0802;
+    }
+
+    .form-label {
+        position: absolute;
+        left: 2.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 0.95rem;
         pointer-events: none;
         transition: all 0.3s ease;
-        background: white;
-        padding: 0 0.5rem;
+        background: transparent;
+        padding: 0 0.25rem;
     }
-    
-    .form-floating-custom input:focus + label,
-    .form-floating-custom input:not(:placeholder-shown) + label {
+
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
         top: 0;
-        font-size: 0.75rem;
-        color: #667eea;
+        left: 0.625rem;
+        font-size: 0.7rem;
+        color: #DE0802;
+        background: linear-gradient(to bottom, transparent 50%, #fff 50%);
+        padding: 0 0.375rem;
     }
-    
-    .btn-primary-custom {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 12px;
-        padding: 1rem;
-        font-size: 1rem;
-        font-weight: 600;
-        color: white;
+
+    /* Submit Button */
+    .btn-submit {
         width: 100%;
+        padding: 0.875rem;
+        background: linear-gradient(135deg, #DE0802 0%, #B3211A 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
         cursor: pointer;
         transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
     }
-    
-    .btn-primary-custom:hover {
+
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 25px rgba(222, 8, 2, 0.4);
     }
-    
-    .auth-footer {
-        text-align: center;
-        padding: 1.5rem 2rem;
-        background: #f8fafc;
-        border-top: 1px solid #e5e7eb;
+
+    .btn-submit:hover::before {
+        left: 100%;
     }
-    
-    .auth-link {
-        color: #667eea;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.3s ease;
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* Back Link */
+    .back-link {
         display: inline-flex;
         align-items: center;
+        gap: 0.5rem;
+        color: #DE0802;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-top: 1.5rem;
+        transition: all 0.3s ease;
     }
-    
-    .auth-link:hover {
-        color: #764ba2;
+
+    .back-link:hover {
+        color: #B3211A;
+        transform: translateX(-5px);
     }
-    
-    .auth-link i {
-        margin-right: 0.5rem;
+
+    .back-link svg {
+        width: 18px;
+        height: 18px;
     }
-    
-    .furniture-pattern {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        opacity: 0.1;
-        font-size: 120px;
-        color: white;
-        z-index: 0;
+
+    /* Footer */
+    .auth-form-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
     }
-    
-    .brand-tagline {
-        font-size: 0.875rem;
-        opacity: 0.9;
-        margin-top: 0.5rem;
-        font-weight: 300;
+
+    .auth-form-footer p {
+        color: #999;
+        font-size: 0.8rem;
     }
-    
-    .icon-lock {
-        font-size: 48px;
-        margin-bottom: 1rem;
-        opacity: 0.8;
-    }
-    
-    @media (max-width: 768px) {
-        .auth-card {
-            margin: 1rem;
-        }
-        
-        .furniture-pattern {
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .auth-decoration {
             display: none;
+        }
+
+        .auth-form-panel {
+            flex: 1;
+            padding: 2rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .auth-form-panel {
+            padding: 1.5rem;
+        }
+
+        .auth-welcome h1 {
+            font-size: 1.25rem;
+        }
+
+        .decoration-title {
+            font-size: 1.75rem;
+        }
+
+        .decoration-features {
+            flex-direction: column;
+            gap: 0.75rem;
         }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="auth-forgot-page">
-    <div class="auth-container">
-        <div class="auth-card">
-            <!-- Header with Logo -->
-            <div class="auth-header">
-                <img src="{{ asset('assets/img/bassani.png') }}" alt="Bassani Móveis" class="auth-logo">
-                <h2 class="mb-0">Recuperar Senha</h2>
-                <p class="brand-tagline">Móveis Planejados</p>
+<div class="auth-wrapper">
+    <!-- Left Panel - Image Background -->
+    <div class="auth-decoration">
+        <!-- Accent Line -->
+        <div class="decoration-accent"></div>
+        
+        <!-- Content Overlay -->
+        <div class="decoration-content">
+            <div class="decoration-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Segurança
             </div>
+            <h1 class="decoration-title">Recuperação de Senha</h1>
+            <p class="decoration-subtitle">Protegemos sua conta com os melhores padrões de segurança</p>
             
-            <!-- Body with Form -->
-            <div class="auth-body">
-                <div class="text-center mb-4">
-                    <i class="bx bx-lock-open icon-lock text-primary"></i>
-                    <h4 class="mb-2">Esqueceu sua senha?</h4>
-                    <p class="text-muted">Informe seu email para receber instruções de recuperação</p>
+            <div class="decoration-features">
+                <div class="feature-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <span>Dados protegidos</span>
                 </div>
-
-                <form id="formAuthentication" action="{{ url('/') }}" method="GET">
-                    <div class="form-floating-custom">
-                        <input type="text" class="form-control" id="email" name="email" placeholder=" " autofocus />
-                        <label for="email">Seu endereço de email</label>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary-custom mb-4">
-                        Enviar Link de Recuperação
-                    </button>
-                </form>
-            </div>
-            
-            <!-- Footer -->
-            <div class="auth-footer">
-                <a href="{{ route('login') }}" class="auth-link">
-                    <i class="bx bx-chevron-left"></i>
-                    Voltar para o login
-                </a>
-                <div class="mt-3">
-                    <small class="text-muted">
-                        © {{ date('Y') }} Bassani Móveis. Todos os direitos reservados.
-                    </small>
+                <div class="feature-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Processo seguro</span>
+                </div>
+                <div class="feature-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Rápida recuperação</span>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Decorative Element -->
-    <div class="furniture-pattern">
-        <i class="bx bx-home"></i>
+
+    <!-- Right Panel - Form -->
+    <div class="auth-form-panel">
+        <div class="auth-form-container">
+            <!-- Logo -->
+            <div class="auth-logo-container">
+                <img src="{{ asset('assets/img/bassani.png') }}" alt="Bassani Móveis" class="auth-logo">
+            </div>
+            
+            <!-- Welcome Text -->
+            <div class="auth-welcome">
+                <div class="icon-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        <circle cx="12" cy="16" r="1"></circle>
+                    </svg>
+                </div>
+                <h1>Esqueceu sua senha?</h1>
+                <p>Informe seu email para receber<br>instruções de recuperação</p>
+            </div>
+
+            <!-- Forgot Password Form -->
+            <form id="formAuthentication" action="{{ url('/') }}" method="GET">
+                <!-- Email Field -->
+                <div class="form-group">
+                    <span class="form-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </span>
+                    <input type="email" class="form-input" id="email" name="email" placeholder=" " autofocus required />
+                    <label class="form-label" for="email">Seu endereço de email</label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn-submit">
+                    Enviar Link de Recuperação
+                </button>
+            </form>
+            
+            <!-- Back Link -->
+            <a href="{{ route('login') }}" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Voltar para o login
+            </a>
+            
+            <!-- Footer -->
+            <div class="auth-form-footer">
+                <p>&copy; {{ date('Y') }} Bassani Móveis. Todos os direitos reservados.</p>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
