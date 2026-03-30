@@ -1,37 +1,28 @@
 <?php
 
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\AssemblerController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\CarBrandController;
-use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\DriverDocumentController;
 use App\Http\Controllers\Admin\AssemblyExpenseController;
+use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\DeliveryWindowController;
+use App\Http\Controllers\Admin\DriverDocumentController;
+use App\Http\Controllers\Admin\FleetReportController;
 use App\Http\Controllers\Admin\FuelUpController;
 use App\Http\Controllers\Admin\MaintenanceController;
-use App\Http\Controllers\PlannedShipmentController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\RepresentativeController;
-use App\Http\Controllers\SaleController;
-use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\VehicleFineController;
-use App\Http\Controllers\Admin\VehicleUsageController;
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RolePermissionController;
-use App\Http\Controllers\Admin\FleetReportController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ShipmentTrackingController;
-use App\Http\Controllers\Admin\DeliveryWindowController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\VehicleUsageController;
+use App\Http\Controllers\AssemblerController;
 use App\Http\Controllers\AssemblyScheduleController;
-use App\Http\Controllers\Admin\LeadController;
-use App\Http\Controllers\Admin\InteractionController;
-use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\PlannedShipmentController;
+use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\VehicleFineController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +34,12 @@ use App\Http\Controllers\Admin\TaskController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('/link-storage', function () {
+    Artisan::call('storage:link');
+
+    return 'Storage link created successfully.';
+});
 
 Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
     Route::resource('roles', RolePermissionController::class);
@@ -59,7 +56,7 @@ Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
     // Vertical CRM (Furniture) Routes
     Route::group(['prefix' => 'crm', 'as' => 'crm.'], function () {
         Route::get('dashboard', [App\Http\Controllers\Admin\CrmDashboardController::class, 'index'])->name('dashboard');
-        
+
         // Leads Module
         Route::get('leads', [App\Http\Controllers\Admin\LeadController::class, 'index'])->name('leads.index');
         Route::get('leads/create', [App\Http\Controllers\Admin\LeadController::class, 'create'])->name('leads.create'); // Fallback if not using modal
@@ -73,7 +70,7 @@ Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
 
         // Route::get('leads', [App\Http\Controllers\Admin\CrmEntityController::class, 'index'])->defaults('type', 'lead')->name('leads.index');
         // Route::get('leads/create', [App\Http\Controllers\Admin\CrmEntityController::class, 'create'])->defaults('type', 'lead')->name('leads.create');
-        
+
         // Route::get('architects', [App\Http\Controllers\Admin\CrmEntityController::class, 'index'])->defaults('type', 'architect')->name('architects.index');
         // Route::get('architects/create', [App\Http\Controllers\Admin\CrmEntityController::class, 'create'])->defaults('type', 'architect')->name('architects.create');
 
@@ -84,14 +81,14 @@ Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
 
         // Architects (Specialized Module)
         Route::resource('architects', App\Http\Controllers\Admin\ArchitectController::class);
-        
+
         // Pipeline & Opportunities
         Route::get('pipeline', [App\Http\Controllers\Admin\CrmPipelineController::class, 'index'])->name('pipeline.index');
         Route::get('pipeline/create', [App\Http\Controllers\Admin\CrmPipelineController::class, 'create'])->name('pipeline.create');
         Route::post('pipeline', [App\Http\Controllers\Admin\CrmPipelineController::class, 'store'])->name('pipeline.store');
-        
+
         // Stage Settings
-        Route::prefix('settings/stages')->name('settings.stages.')->group(function() {
+        Route::prefix('settings/stages')->name('settings.stages.')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\PipelineStageController::class, 'index'])->name('index');
             Route::post('/', [App\Http\Controllers\Admin\PipelineStageController::class, 'store'])->name('store');
             Route::put('/{stage}', [App\Http\Controllers\Admin\PipelineStageController::class, 'update'])->name('update');
@@ -102,7 +99,7 @@ Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
 
     // API Route for External Updates (e.g. Production) & Pipeline API
     Route::post('api/crm/opportunities/{opportunity}/stage', [App\Http\Controllers\Admin\CrmPipelineController::class, 'updateStage'])->name('crm.api.opportunity.stage');
-    
+
     // Additional Opportunity Routes (outside resource if necessary or integrated)
     Route::group(['prefix' => 'crm', 'as' => 'crm.'], function () {
         Route::get('opportunities/{opportunity}', [\App\Http\Controllers\Admin\CrmPipelineController::class, 'show'])->name('opportunities.show');
@@ -112,11 +109,11 @@ Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
         Route::post('opportunities/{opportunity}/won', [App\Http\Controllers\Admin\CrmPipelineController::class, 'markWon'])->name('opportunities.won'); // Need to add method to controller
         Route::post('opportunities/{opportunity}/lost', [App\Http\Controllers\Admin\CrmPipelineController::class, 'markLost'])->name('opportunities.lost'); // Need to add method to controller
         Route::post('opportunities/{opportunity}/interaction', [App\Http\Controllers\Admin\LeadController::class, 'logInteraction'])->name('opportunities.interaction'); // Reuse or create new
-        
+
         // CRM Activities & Tasks
         Route::post('opportunities/{opportunity}/activities', [App\Http\Controllers\Admin\CrmActivityController::class, 'store'])->name('opportunities.activities.store');
         Route::post('activities/{activity}/complete', [App\Http\Controllers\Admin\CrmActivityController::class, 'complete'])->name('activities.complete');
-        
+
         // CRM Activity Dashboard
         Route::get('activities/dashboard', [App\Http\Controllers\Admin\ActivityDashboardController::class, 'index'])->name('activities.dashboard');
 
@@ -131,7 +128,7 @@ Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
     Route::resource('vehicle_fines', VehicleFineController::class);
     Route::get('vehicle_fines-data', [VehicleFineController::class, 'data'])->name('vehicle_fines.data');
     Route::resource('planned_shipments', PlannedShipmentController::class)->parameters([
-        'planned_shipments' => 'plannedShipment'
+        'planned_shipments' => 'plannedShipment',
     ]);
     Route::get('planned_shipments-data', [PlannedShipmentController::class, 'data'])->name('planned_shipments.data');
     Route::get('reports/customers', [ReportController::class, 'customerReports'])->name('reports.customers');
@@ -162,12 +159,28 @@ Route::middleware(['auth', 'role'])->prefix('admin')->group(function () {
     // Assembly Expenses
     Route::resource('assembly-expenses', AssemblyExpenseController::class)->only(['index', 'store', 'destroy']);
     Route::post('assembly-expenses/{expense}/approve', [AssemblyExpenseController::class, 'approve'])->name('assembly-expenses.approve');
-    Route::post('assembly-expenses/{expense}/reject',  [AssemblyExpenseController::class, 'reject'])->name('assembly-expenses.reject');
+    Route::post('assembly-expenses/{expense}/reject', [AssemblyExpenseController::class, 'reject'])->name('assembly-expenses.reject');
+
+    // Admin Time Clock (Espelho de Ponto)
+    Route::get('time-clock', [App\Http\Controllers\TimeClock\AdminTimeClockController::class, 'index'])->name('timeclock.index');
+    Route::get('time-clock/{userId}', [App\Http\Controllers\TimeClock\AdminTimeClockController::class, 'show'])->name('timeclock.show');
 });
 
-
+// Driver Check-up Routes (separate middleware group for drivers)
+Route::middleware(['auth', 'role'])->prefix('driver')->name('driver.')->group(function () {
+    Route::get('home', [App\Http\Controllers\Driver\HomeController::class, 'index'])->name('home');
+    Route::resource('checkups', App\Http\Controllers\Driver\VehicleCheckupController::class)->only(['create', 'store']);
+});
 
 Route::get('/', function () {
+    $user = Auth::user();
+    if ($user && $user->hasRole('Montador')) {
+        return redirect('/assembler/home');
+    }
+    if ($user && $user->hasRole('Motorista')) {
+        return redirect('/driver/my-schedule');
+    }
+
     return redirect()->route('dashboard.index');
 });
 
@@ -176,8 +189,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->middleware('guest')->name('password.request');
 
-
-
 Route::get('/sales/export/excel', [SaleController::class, 'exportExcel'])->name('sales.export.excel');
 Route::get('/sales/export/pdf', [SaleController::class, 'exportPdf'])->name('sales.export.pdf');
 
@@ -185,21 +196,33 @@ Route::get('sales/data', [SaleController::class, 'data'])->name('sales.data');
 Route::get('drivers/data', [DriverController::class, 'data'])->name('drivers.data');
 Route::get('/assemblers-available', [App\Http\Controllers\AssemblerController::class, 'getAvailableAssemblers'])->name('assemblers.available');
 Route::get('/sales/{sale}/schedule-assembly', [App\Http\Controllers\SaleController::class, 'scheduleAssemblyCreate'])->name('sales.scheduleAssembly.create');
-
+Route::post('sales/import', [SaleController::class, 'import'])->name('sales.import');
 
 Route::get('sales/kanbanData', [SaleController::class, 'kanbanData'])->name('sales.kanbanData');
 Route::patch('sales/{sale}/update-status', [SaleController::class, 'updateStatus'])->name('sales.updateStatus');
 Route::get('/crm/dashboard', [App\Http\Controllers\Admin\CrmDashboardController::class, 'index'])->name('crm.dashboard');
 Route::resource('sales', SaleController::class);
 
-
 Route::middleware('auth')->group(function () {
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Assembler App (Mobile)
+    Route::get('/assembler/home', [App\Http\Controllers\Assembler\HomeController::class, 'index'])->name('assembler.home');
+    Route::get('/assembler/expenses', [App\Http\Controllers\Assembler\ExpenseController::class, 'index'])->name('assembler.expenses');
+    Route::get('/assembler/expenses/create', [App\Http\Controllers\Assembler\ExpenseController::class, 'create'])->name('assembler.expenses.create');
+    Route::post('/assembler/expenses', [App\Http\Controllers\Assembler\ExpenseController::class, 'store'])->name('assembler.expenses.store');
+
     // My Schedule for Assemblers
     Route::get('/my-schedule', [AssemblyScheduleController::class, 'mySchedule'])->name('assembler.my-schedule');
+
+    // Meu Ponto (Time Clock for Assemblers)
+    Route::prefix('meu-ponto')->name('meu-ponto.')->group(function () {
+        Route::get('/', [App\Http\Controllers\TimeClock\TimeClockController::class, 'index'])->name('index');
+        Route::post('/', [App\Http\Controllers\TimeClock\TimeClockController::class, 'store'])->name('store');
+        Route::get('/today', [App\Http\Controllers\TimeClock\TimeClockController::class, 'today'])->name('today');
+    });
     Route::post('/my-schedule/confirm', [AssemblyScheduleController::class, 'confirmPresence'])->name('assembler.my-schedule.confirm');
     Route::post('/my-schedule/start', [AssemblyScheduleController::class, 'startAssembly'])->name('assembler.my-schedule.start');
     Route::get('/my-schedule/start/{assemblySchedule}', [AssemblyScheduleController::class, 'startForm'])->name('assembler.my-schedule.start.form');
@@ -220,6 +243,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/driver/destinations/start', [App\Http\Controllers\DriverScheduleController::class, 'startDelivery'])->name('driver.destinations.start');
     Route::get('/driver/destinations/{destination}/finish', [App\Http\Controllers\DriverScheduleController::class, 'finishForm'])->name('driver.destinations.finish.form');
     Route::post('/driver/destinations/finish', [App\Http\Controllers\DriverScheduleController::class, 'finishDelivery'])->name('driver.destinations.finish');
+
+    Route::get('/driver/expenses', [App\Http\Controllers\Driver\ExpenseController::class, 'index'])->name('driver.expenses');
+    Route::get('/driver/expenses/create', [App\Http\Controllers\Driver\ExpenseController::class, 'create'])->name('driver.expenses.create');
+    Route::post('/driver/expenses', [App\Http\Controllers\Driver\ExpenseController::class, 'store'])->name('driver.expenses.store');
 });
 
 // Public evaluation routes
@@ -227,5 +254,3 @@ Route::get('/assembly-evaluation/{token}', [App\Http\Controllers\AssemblyEvaluat
 Route::post('/assembly-evaluation/{token}', [App\Http\Controllers\AssemblyEvaluationController::class, 'submit'])->name('assembly-evaluation.submit');
 Route::get('/delivery-evaluation/{token}', [App\Http\Controllers\DeliveryEvaluationController::class, 'show'])->name('delivery-evaluation.show');
 Route::post('/delivery-evaluation/{token}', [App\Http\Controllers\DeliveryEvaluationController::class, 'submit'])->name('delivery-evaluation.submit');
-
-

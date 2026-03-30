@@ -18,17 +18,13 @@ class PlannedShipmentController extends Controller
 
     public function data()
     {
-        $data = PlannedShipment::with(['vehicle', 'driver'])->select('planned_shipments.*');
+        $data = PlannedShipment::with(['vehicle', 'driver'])
+            ->select('planned_shipments.shipment_id', 'planned_shipments.shipment_number', 'planned_shipments.vehicle_id', 'planned_shipments.driver_id', 'planned_shipments.planned_departure_date', 'planned_shipments.planned_delivery_date', 'planned_shipments.status');
+        
         return Datatables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function($row){
-                $btn = '<a href="' . route('planned_shipments.show', ['plannedShipment' => $row->shipment_id]) . '" class="btn btn-info btn-sm">Ver</a> ';
-                $btn .= '<a href="' . route('planned_shipments.edit', ['plannedShipment' => $row->shipment_id]) . '" class="btn btn-warning btn-sm">Editar</a> ';
-                $btn .= '<form action="' . route('planned_shipments.destroy', ['plannedShipment' => $row->shipment_id]) . '" method="POST" style="display:inline;">'
-                    . csrf_field() . method_field('DELETE')
-                    . '<button type="submit" class="btn btn-danger btn-sm">Excluir</button>'
-                    . '</form>';
-                return $btn;
+                return '';
             })
             ->rawColumns(['action'])
             ->make(true);

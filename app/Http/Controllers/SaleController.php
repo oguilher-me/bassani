@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sale;
-use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Enums\OrderStatusEnum;
 use App\Exports\SalesExport;
+use App\Models\Sale;
 use Barryvdh\Snappy\Facades\SnappyPdf;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Enums\PaymentStatusEnum;
-use App\Enums\PaymentMethodEnum;
-use App\Enums\OrderStatusEnum;
+use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
 
 class SaleController extends Controller
 {
@@ -22,8 +20,9 @@ class SaleController extends Controller
     public function index()
     {
         $orderStatuses = collect(\App\Enums\OrderStatusEnum::cases())
-            ->filter(fn($status) => !in_array($status, [\App\Enums\OrderStatusEnum::Completed, \App\Enums\OrderStatusEnum::Cancelled]))
+            ->filter(fn ($status) => ! in_array($status, [\App\Enums\OrderStatusEnum::Completed, \App\Enums\OrderStatusEnum::Cancelled]))
             ->values();
+
         return view('sales.index', compact('orderStatuses'));
     }
 
@@ -55,16 +54,18 @@ class SaleController extends Controller
                         OrderStatusEnum::Completed => 'bg-label-success',
                         default => 'bg-label-secondary', // Fallback para status não reconhecidos
                     };
-                    return '<span class="badge ' . $badgeClass . '">' . ucfirst($status->label()) . '</span>';
+
+                    return '<span class="badge '.$badgeClass.'">'.ucfirst($status->label()).'</span>';
                 })
                 ->addColumn('actions', function ($sale) {
-                    $actions = '<a href="' . route('sales.show', $sale->id) . '" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" title="Ver Detalhes"><i class="bx bx-show"></i></a>';
-                    $actions .= '<a href="' . route('sales.edit', $sale->id) . '" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" title="Editar"><i class="bx bx-edit"></i></a>';
-                    $actions .= '<form action="' . route('sales.destroy', $sale->id) . '" method="POST" class="d-inline delete-form">';
+                    $actions = '<a href="'.route('sales.show', $sale->id).'" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" title="Ver Detalhes"><i class="bx bx-show"></i></a>';
+                    $actions .= '<a href="'.route('sales.edit', $sale->id).'" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" title="Editar"><i class="bx bx-edit"></i></a>';
+                    $actions .= '<form action="'.route('sales.destroy', $sale->id).'" method="POST" class="d-inline delete-form">';
                     $actions .= csrf_field();
                     $actions .= method_field('DELETE');
                     $actions .= '<button type="submit" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" title="Inativar"><i class="bx bx-trash"></i></button>';
                     $actions .= '</form>';
+
                     return $actions;
                 })
                 ->rawColumns(['status', 'actions'])
@@ -75,7 +76,8 @@ class SaleController extends Controller
                 ->orderColumn('status', 'order_status $1')
                 ->make(true);
         } catch (\Exception $e) {
-            Log::error('Erro no método data() do SaleController: ' . $e->getMessage());
+            Log::error('Erro no método data() do SaleController: '.$e->getMessage());
+
             return response()->json(['error' => 'Ocorreu um erro ao carregar os dados das vendas.'], 500);
         }
     }
@@ -122,13 +124,14 @@ class SaleController extends Controller
             'actual_delivery_date' => 'nullable|date|after_or_equal:issue_date|after_or_equal:expected_delivery_date',
             'sales_responsible' => 'nullable|string|max:255',
             'representative_id' => 'nullable|exists:representatives,id',
-            'sales_division' => 'required|in:' . implode(',', array_column(\App\Enums\SalesDivisionEnum::cases(), 'value')),
+            'sales_division' => 'required|in:'.implode(',', array_column(\App\Enums\SalesDivisionEnum::cases(), 'value')),
             'carrier_id' => 'nullable|exists:carriers,id',
             'payment_term_id' => 'nullable|exists:payment_terms,id',
             'currency' => 'required|string|max:3',
             'contact_name' => 'nullable|string|max:255',
             'contact_email' => 'nullable|email|max:255',
             'contact_phone' => 'nullable|string|max:255',
+            'payment_method' => 'required|in:'.implode(',', array_column(\App\Enums\PaymentMethodEnum::cases(), 'value')),
             'purchase_order' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
             'erp_code' => 'nullable|string|max:255',
@@ -144,11 +147,11 @@ class SaleController extends Controller
             'net_weight' => 'nullable|numeric|min:0',
             'cubic_volume' => 'nullable|numeric|min:0',
             'packages' => 'nullable|integer|min:0',
-            'order_status' => 'required|in:' . implode(',', array_column(\App\Enums\OrderStatusEnum::cases(), 'value')),
-            'delivery_status' => 'required|in:' . implode(',', array_column(\App\Enums\DeliveryStatusEnum::cases(), 'value')),
-            'shipping_method' => 'required|in:' . implode(',', array_column(\App\Enums\ShippingMethodEnum::cases(), 'value')),
+            'order_status' => 'required|in:'.implode(',', array_column(\App\Enums\OrderStatusEnum::cases(), 'value')),
+            'delivery_status' => 'required|in:'.implode(',', array_column(\App\Enums\DeliveryStatusEnum::cases(), 'value')),
+            'shipping_method' => 'required|in:'.implode(',', array_column(\App\Enums\ShippingMethodEnum::cases(), 'value')),
             'tracking_code' => 'nullable|string|max:255',
-            'payment_method' => 'required|in:' . implode(',', array_column(\App\Enums\PaymentMethodEnum::cases(), 'value')),
+            'payment_method' => 'required|in:'.implode(',', array_column(\App\Enums\PaymentMethodEnum::cases(), 'value')),
             'sale_items' => 'required|array|min:1',
             'sale_items.*.product_id' => 'required|exists:products,id',
             'sale_items.*.description' => 'nullable|string|max:255',
@@ -188,7 +191,7 @@ class SaleController extends Controller
         }
 
         return redirect()->route('sales.show', $sale->id)
-                         ->with('success', 'Venda criada com sucesso!');
+            ->with('success', 'Venda criada com sucesso!');
     }
 
     /**
@@ -197,6 +200,7 @@ class SaleController extends Controller
     public function show(string $id)
     {
         $sale = Sale::findOrFail($id);
+
         return view('sales.show', compact('sale'));
     }
 
@@ -248,7 +252,7 @@ class SaleController extends Controller
             'actual_delivery_date' => 'nullable|date|after_or_equal:issue_date|after_or_equal:expected_delivery_date',
             'sales_responsible' => 'nullable|string|max:255',
             'representative_id' => 'nullable|exists:representatives,id',
-            'sales_division' => 'required|in:' . implode(',', array_column(\App\Enums\SalesDivisionEnum::cases(), 'value')),
+            'sales_division' => 'required|in:'.implode(',', array_column(\App\Enums\SalesDivisionEnum::cases(), 'value')),
             'carrier_id' => 'nullable|exists:carriers,id',
             'payment_term_id' => 'nullable|exists:payment_terms,id',
             'currency' => 'required|string|max:3',
@@ -270,11 +274,11 @@ class SaleController extends Controller
             'net_weight' => 'nullable|numeric|min:0',
             'cubic_volume' => 'nullable|numeric|min:0',
             'packages' => 'nullable|integer|min:0',
-            'order_status' => 'required|in:' . implode(',', array_column(\App\Enums\OrderStatusEnum::cases(), 'value')),
-            'delivery_status' => 'required|in:' . implode(',', array_column(\App\Enums\DeliveryStatusEnum::cases(), 'value')),
-            'shipping_method' => 'required|in:' . implode(',', array_column(\App\Enums\ShippingMethodEnum::cases(), 'value')),
+            'order_status' => 'required|in:'.implode(',', array_column(\App\Enums\OrderStatusEnum::cases(), 'value')),
+            'delivery_status' => 'required|in:'.implode(',', array_column(\App\Enums\DeliveryStatusEnum::cases(), 'value')),
+            'shipping_method' => 'required|in:'.implode(',', array_column(\App\Enums\ShippingMethodEnum::cases(), 'value')),
             'tracking_code' => 'nullable|string|max:255',
-            'payment_method' => 'required|in:' . implode(',', array_column(\App\Enums\PaymentMethodEnum::cases(), 'value')),
+            'payment_method' => 'required|in:'.implode(',', array_column(\App\Enums\PaymentMethodEnum::cases(), 'value')),
             'sale_items' => 'required|array|min:1',
             'sale_items.*.product_id' => 'required|exists:products,id',
             'sale_items.*.description' => 'nullable|string|max:255',
@@ -321,7 +325,7 @@ class SaleController extends Controller
         }
 
         return redirect()->route('sales.show', $sale->id)
-                         ->with('success', 'Venda atualizada com sucesso!');
+            ->with('success', 'Venda atualizada com sucesso!');
     }
 
     /**
@@ -333,7 +337,7 @@ class SaleController extends Controller
         $sale->delete();
 
         return redirect()->route('sales.index')
-                         ->with('success', 'Venda excluída com sucesso!');
+            ->with('success', 'Venda excluída com sucesso!');
     }
 
     public function exportExcel()
@@ -345,6 +349,7 @@ class SaleController extends Controller
     {
         $sales = Sale::all();
         $pdf = SnappyPdf::loadView('sales.export_pdf', compact('sales'));
+
         return $pdf->download('sales.pdf');
     }
 
@@ -361,7 +366,7 @@ class SaleController extends Controller
     public function updateStatus(Request $request, Sale $sale)
     {
         $request->validate([
-            'status' => 'required|in:' . implode(',', array_column(OrderStatusEnum::cases(), 'value')),
+            'status' => 'required|in:'.implode(',', array_column(OrderStatusEnum::cases(), 'value')),
             'actual_delivery_date' => 'nullable|date',
         ]);
 
@@ -369,7 +374,7 @@ class SaleController extends Controller
         $sale->order_status = $newStatus;
 
         // Se o novo status for 'In Assembly' e a data de entrega real não foi fornecida, preenche com a data atual
-        if ($newStatus === OrderStatusEnum::Delivered && !$request->has('actual_delivery_date')) {
+        if ($newStatus === OrderStatusEnum::Delivered && ! $request->has('actual_delivery_date')) {
             $sale->actual_delivery_date = now();
         } elseif ($request->has('actual_delivery_date')) {
             $sale->actual_delivery_date = $request->actual_delivery_date;
@@ -383,5 +388,49 @@ class SaleController extends Controller
     public function scheduleAssemblyCreate(Sale $sale)
     {
         return view('sales.schedule-assembly', compact('sale'));
+    }
+
+    /**
+     * Import a sale from an Excel file
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'sale_file' => 'required|file|max:10240',
+        ]);
+
+        $file = $request->file('sale_file');
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        if (! in_array($extension, ['xls', 'xlsx'])) {
+            return back()
+                ->withInput()
+                ->withErrors(['sale_file' => 'O campo sale file deve ser um arquivo do tipo: xls, xlsx.']);
+        }
+
+        try {
+            // Get the uploaded file directly
+            $tempPath = $file->getRealPath();
+
+            // Import using our importer
+            $importer = new \App\Modules\SalesOrderImporter($tempPath, auth()->id() ?? 1);
+            $saleId = $importer->import();
+
+            // dd($saleId);
+            if ($saleId !== false) {
+                return redirect()->route('sales.show', $saleId)
+                    ->with('success', 'Venda importada com sucesso!');
+            } else {
+                return back()
+                    ->withInput()
+                    ->withErrors(['sale_file' => 'Falha ao processar o arquivo. Verifique o formato e tente novamente.']);
+            }
+        } catch (\Exception $e) {
+            \Log::Error('Erro na importação de venda: '.$e->getMessage());
+
+            return back()
+                ->withInput()
+                ->withErrors(['sale_file' => 'Ocorreu um erro ao processar o arquivo: '.$e->getMessage()]);
+        }
     }
 }

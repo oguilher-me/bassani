@@ -1,5 +1,422 @@
 // This file is used for writing your custom styles
+// Bassani Móveis Custom Styles
 
-// .card {
-//    background-color: #fd0000;
-//  }
+// ==========================================================================
+// CSS Variables for Bassani Theme
+// ==========================================================================
+:root {
+  --bassani-red: #DE0802;
+  --bassani-red-dark: #B3211A;
+  --bassani-navy: #1F2A44;
+  --bassani-gray: #D2D4DA;
+
+  // Override Bootstrap primary
+  --bs-primary: #DE0802;
+  --bs-primary-rgb: 222, 8, 2;
+
+  // Menu colors - override Bootstrap CSS variables
+  --bs-menu-bg: #1F2A44 !important;
+  --bs-menu-color: #D2D4DA !important;
+  --bs-menu-active-bg: rgba(222, 8, 2, 0.15) !important;
+  --bs-menu-active-color: #DE0802 !important;
+  --bs-menu-hover-bg: rgba(222, 8, 2, 0.08) !important;
+  --bs-menu-hover-color: #ffffff !important;
+
+  // Legacy custom variables (kept for compatibility)
+  --menu-bg: #1F2A44;
+  --menu-color: #D2D4DA;
+  --menu-active-bg: rgba(222, 8, 2, 0.15);
+  --menu-active-color: #DE0802;
+  --menu-hover-bg: rgba(222, 8, 2, 0.08);
+}
+
+// ==========================================================================
+// Menu Sidebar Customization
+// ==========================================================================
+.layout-menu,
+.mobile-menu {
+  display: flex !important;
+  flex-direction: column !important;
+
+  >.menu-inner {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+.layout-menu {
+  background: var(--bs-menu-bg, #1F2A44) !important;
+
+  .app-brand {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .app-brand-link {
+      img {
+        filter: brightness(0) invert(1);
+        height: 45px !important;
+      }
+    }
+  }
+
+  .menu-inner {
+    .menu-header {
+      color: rgba(210, 212, 218, 0.5);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 1rem 1.25rem 0.5rem;
+    }
+
+    .menu-item {
+      .menu-link {
+        color: var(--bs-menu-color, #D2D4DA);
+        padding: 0.625rem 1.25rem;
+        transition: all 0.2s ease;
+
+        .menu-icon {
+          color: rgba(210, 212, 218, 0.7);
+          font-size: 1.25rem;
+        }
+
+        .menu-title {
+          font-size: 0.9rem;
+        }
+
+        &:hover {
+          background: var(--bs-menu-hover-bg, rgba(222, 8, 2, 0.08));
+          color: var(--bs-menu-hover-color, #ffffff);
+
+          .menu-icon {
+            color: var(--bassani-red);
+          }
+        }
+      }
+
+      &.active {
+        >.menu-link {
+          background: var(--bs-menu-active-bg, rgba(222, 8, 2, 0.15));
+          color: var(--bs-menu-active-color, #DE0802);
+
+          .menu-icon {
+            color: var(--bassani-red);
+          }
+
+          &::before {
+            background: var(--bassani-red);
+          }
+        }
+
+        &.open {
+          >.menu-link {
+            color: $white;
+          }
+        }
+      }
+
+      &.open {
+        >.menu-link {
+          color: $white;
+        }
+
+        .submenu {
+          .menu-item {
+            .menu-link {
+              color: rgba(210, 212, 218, 0.8);
+
+              &:hover {
+                color: $white;
+              }
+            }
+
+            &.active .menu-link {
+              color: var(--bassani-red);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .menu-divider {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .menu-footer {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+
+    .avatar-initial {
+      background: var(--bassani-red) !important;
+      color: $white !important;
+      font-weight: 600;
+    }
+
+    .btn-outline-light {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: $white;
+
+      &:hover {
+        background: var(--bassani-red);
+        border-color: var(--bassani-red);
+        color: $white;
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Navbar Customization
+// ==========================================================================
+.navbar {
+  background: $white !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .navbar-nav {
+    .nav-item {
+      .nav-link {
+        color: var(--bassani-navy);
+
+        &:hover {
+          color: var(--bassani-red);
+        }
+      }
+    }
+  }
+
+  // Notifications badge
+  .badge-notifications {
+    background: var(--bassani-red) !important;
+  }
+
+  // User avatar initial circle
+  .avatar-initial {
+    background: var(--bassani-red) !important;
+    color: $white !important;
+    font-weight: 600;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--bassani-red-dark) !important;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(222, 8, 2, 0.35);
+    }
+  }
+}
+
+// ==========================================================================
+// Footer Customization
+// ==========================================================================
+.content-footer {
+  background: var(--bassani-navy);
+
+  .footer {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+
+    .footer-link {
+      color: var(--bassani-red);
+      text-decoration: none;
+
+      &:hover {
+        color: lighten(#DE0802, 10%);
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Buttons Customization
+// ==========================================================================
+.btn-primary {
+  background: linear-gradient(135deg, var(--bassani-red) 0%, var(--bassani-red-dark) 100%);
+  border: none;
+
+  &:hover {
+    background: linear-gradient(135deg, lighten(#DE0802, 5%) 0%, var(--bassani-red) 100%);
+    box-shadow: 0 4px 12px rgba(222, 8, 2, 0.35);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(222, 8, 2, 0.25);
+  }
+}
+
+.btn-outline-primary {
+  color: var(--bassani-red);
+  border-color: var(--bassani-red);
+
+  &:hover {
+    background: var(--bassani-red);
+    border-color: var(--bassani-red);
+    color: $white;
+  }
+}
+
+// ==========================================================================
+// Cards Customization
+// ==========================================================================
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+
+  .card-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 1rem 1.25rem;
+  }
+}
+
+// ==========================================================================
+// Alerts Customization
+// ==========================================================================
+.alert-primary {
+  background: rgba(222, 8, 2, 0.1);
+  border: 1px solid rgba(222, 8, 2, 0.2);
+  color: var(--bassani-red-dark);
+}
+
+.alert-danger {
+  background: rgba(179, 33, 26, 0.1);
+  border: 1px solid rgba(179, 33, 26, 0.2);
+  color: var(--bassani-red-dark);
+}
+
+// ==========================================================================
+// Tables Customization
+// ==========================================================================
+.table {
+  --bs-table-striped-bg: rgba(31, 42, 68, 0.03);
+  --bs-table-hover-bg: rgba(222, 8, 2, 0.04);
+
+  thead {
+    th {
+      background: var(--bassani-navy);
+      color: $white;
+      font-weight: 500;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+    }
+  }
+}
+
+// ==========================================================================
+// Form Controls
+// ==========================================================================
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bassani-red);
+  box-shadow: 0 0 0 3px rgba(222, 8, 2, 0.15);
+}
+
+// ==========================================================================
+// Badges
+// ==========================================================================
+.badge.bg-primary {
+  background: var(--bassani-red) !important;
+}
+
+.badge.bg-danger {
+  background: var(--bassani-red-dark) !important;
+}
+
+// ==========================================================================
+// Text Colors
+// ==========================================================================
+.text-primary {
+  color: var(--bassani-red) !important;
+}
+
+.text-danger {
+  color: var(--bassani-red-dark) !important;
+}
+
+// ==========================================================================
+// Links
+// ==========================================================================
+a {
+  color: var(--bassani-red);
+
+  &:hover {
+    color: var(--bassani-red-dark);
+  }
+}
+
+// ==========================================================================
+// Mobile Menu Styles
+// ==========================================================================
+@media (max-width: 991.98px) {
+  .layout-menu {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 1050;
+    transition: left 0.3s ease-in-out;
+    overflow-y: auto;
+
+    &.active {
+      left: 0;
+    }
+  }
+
+  .layout-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  body.menu-open {
+    overflow: hidden;
+  }
+
+  .layout-page {
+    padding-top: 56px;
+  }
+
+  .layout-menu-toggle {
+    position: fixed !important;
+    top: 10px;
+    left: 10px;
+    z-index: 1055;
+
+    .btn {
+      background: white;
+      border-color: rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  .layout-menu-toggle.d-lg-none {
+    display: none !important;
+  }
+}

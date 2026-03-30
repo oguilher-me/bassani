@@ -88,19 +88,29 @@ class AssemblyExpenseController extends Controller
     }
 
     /**
-     * Approve an expense (Admin / Financial).
+     * Approve an expense (Admin only).
      */
     public function approve(AssemblyExpense $expense)
     {
+        $user = Auth::user();
+        if (!$user->hasRole('Admin')) {
+            return back()->with('error', 'Apenas administradores podem aprovar despesas.');
+        }
+        
         $expense->update(['status' => 'aprovado', 'rejection_reason' => null]);
         return back()->with('success', 'Despesa aprovada com sucesso!');
     }
 
     /**
-     * Reject an expense with a reason (Admin / Financial).
+     * Reject an expense with a reason (Admin only).
      */
     public function reject(Request $request, AssemblyExpense $expense)
     {
+        $user = Auth::user();
+        if (!$user->hasRole('Admin')) {
+            return back()->with('error', 'Apenas administradores podem rejeitar despesas.');
+        }
+        
         $request->validate([
             'rejection_reason' => 'required|string|max:500',
         ]);

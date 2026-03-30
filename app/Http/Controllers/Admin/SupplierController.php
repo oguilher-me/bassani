@@ -13,8 +13,10 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $suppliers = Supplier::all();
-        return view('admin.suppliers.index', compact('suppliers'));
+        $suppliers = Supplier::latest()->paginate(15);
+        $totalActive = Supplier::where('status', 'Ativo')->count();
+        $totalInactive = Supplier::where('status', 'Inativo')->count();
+        return view('admin.suppliers.index', compact('suppliers', 'totalActive', 'totalInactive'));
     }
 
     /**

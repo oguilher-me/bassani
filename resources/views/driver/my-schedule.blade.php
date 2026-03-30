@@ -1,70 +1,71 @@
-@extends('layouts/contentNavbarLayout')
-@section('title', __('Minha Agenda'))
+@extends('driver.layout')
+@section('title', 'Minhas Entregas')
+
 @section('content')
-<div class="row mb-3">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header">{{ __('Entregas de Hoje') }}</div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>{{ __('Endereço') }}</th>
-                <th>{{ __('Janela') }}</th>
-                <th>{{ __('Veículo') }}</th>
-                <th>{{ __('Carga') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($dailyDestinations as $d)
-              <tr>
-                <td>{{ $d->id }}</td>
-                <td>{{ $d->address }}</td>
-                <td>{{ optional($d->window_start)->format('d/m/Y H:i') }} - {{ optional($d->window_end)->format('d/m/Y H:i') }}</td>
-                <td>{{ optional($d->plannedShipment->vehicle)->modelo }} {{ optional($d->plannedShipment->vehicle)->placa }}</td>
-                <td>{{ $d->plannedShipment->shipment_number }}</td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
+<div class="app-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <div class="greeting">Olá, {{ Auth::user()->name ?? 'Motorista' }}</div>
         </div>
-      </div>
+        <div class="avatar">
+            {{ strtoupper(substr(Auth::user()->name ?? 'M', 0, 1)) }}
+        </div>
     </div>
-  </div>
 </div>
 
-<div class="row mb-3">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header">{{ __('Entrega na Semana') }}</div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>{{ __('Dia/Hora') }}</th>
-                <th>{{ __('Endereço') }}</th>
-                <th>{{ __('Carga') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($weeklyDestinations as $d)
-              <tr>
-                <td>{{ $d->id }}</td>
-                <td>{{ optional($d->window_start)->format('d/m/Y H:i') }}</td>
-                <td>{{ $d->address }}</td>
-                <td>{{ $d->plannedShipment->shipment_number }}</td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="section-title">Entregas de Hoje</div>
+
+@if($dailyDestinations->isEmpty())
+<div class="empty-state">
+    <i class="bx bx-package"></i>
+    <p>Nenhuma entrega para hoje</p>
 </div>
+@else
+@foreach($dailyDestinations as $d)
+<div class="delivery-card">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+            <div class="delivery-client">{{ $d->customer->company_name ?? $d->customer->full_name ?? 'Cliente' }}</div>
+            <div class="delivery-address">{{ $d->address }}, {{ $d->neighborhood }}</div>
+            <div class="delivery-address">{{ $d->city }} - {{ $d->state }}</div>
+        </div>
+        <span class="delivery-status {{ $d->status === 'completed' ? 'status-completed' : ($d->status === 'in_progress' ? 'status-in-progress' : 'status-pending') }}">
+            {{ $d->status === 'completed' ? 'Concluída' : ($d->status === 'in_progress' ? 'Em Andamento' : 'Pendente') }}
+        </span>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="text-muted">{{ optional($d->window_start)->format('H:i') }} - {{ optional($d->window_end)->format('H:i') }}</small>
+        @if($d->status !== 'completed')
+        <a href="{{ route('driver.destinations.show', $d->id) }}" class="btn-action">
+            <i class="bx bx-navigation"></i> Ver Detalhes
+        </a>
+        @endif
+    </div>
+</div>
+@endforeach
+@endif
+
+<div class="section-title">Próximas Entregas</div>
+
+@if($weeklyDestinations->isEmpty())
+<div class="empty-state">
+    <i class="bx bx-calendar"></i>
+    <p>Nenhuma entrega agendada</p>
+</div>
+@else
+@foreach($weeklyDestinations as $d)
+<div class="delivery-card">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+            <div class="delivery-client">{{ $d->customer->company_name ?? $d->customer->full_name ?? 'Cliente' }}</div>
+            <div class="delivery-address">{{ $d->address }}</div>
+        </div>
+        <span class="delivery-status status-pending">Agendada</span>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="text-muted">{{ optional($d->window_start)->format('d/m H:i') }}</small>
+    </div>
+</div>
+@endforeach
+@endif
 @endsection
-

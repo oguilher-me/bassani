@@ -3,134 +3,238 @@
 @section('title', __('Detalhes da Carga Planejada'))
 
 @section('content')
-
-<div class="row mb-6 gy-6" style="margin-bottom: 10px !important;">
-    <div class="col-xl-12 col-lg-12 col-md-12 order-0 order-md-0">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ __('Detalhes da Carga Planejada') }} #{{ $plannedShipment->shipment_number }}</h5>
-                <a href="{{ route('planned_shipments.index') }}" class="btn btn-primary">{{ __('Voltar') }}</a>
-            </div> 
-        </div>
+{{-- Page Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">{{ __('Detalhes da Carga Planejada') }}</h4>
+        <p class="text-muted mb-0">{{ $plannedShipment->shipment_number }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ route('planned_shipments.edit', $plannedShipment) }}" class="btn btn-primary">
+            <i class="bx bx-edit me-1"></i> {{ __('Editar') }}
+        </a>
+        <a href="{{ route('planned_shipments.index') }}" class="btn btn-outline-secondary">
+            <i class="bx bx-arrow-back me-1"></i> {{ __('Voltar') }}
+        </a>
     </div>
 </div>
-<div class="row mb-6 gy-6">
-    <!-- Left Column: Planned Shipment Details -->
-    <div class="col-xl-8 col-lg-8 col-md-8 order-0 order-md-0">
-        <!-- About Planned Shipment Card -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <small class="card-text text-uppercase">{{ __('Informações da Carga') }}</small>
-                <ul class="list-unstyled mb-4 mt-3">
-                    <li class="d-flex align-items-center mb-3">
-                        <i class="bx bx-hash"></i><span class="fw-medium mx-2">{{ __('Número da Carga:') }}</span>
-                        <span>{{ $plannedShipment->shipment_number }}</span>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <i class="bx bx-car"></i><span class="fw-medium mx-2">{{ __('Veículo:') }}</span>
-                        <span>{{ $plannedShipment->vehicle->modelo ?? __('N/A') }}</span>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <i class="bx bx-user"></i><span class="fw-medium mx-2">{{ __('Motorista:') }}</span>
-                        <span>{{ $plannedShipment->driver->full_name ?? __('N/A') }}</span>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <i class="bx bx-calendar"></i><span class="fw-medium mx-2">{{ __('Saída Planejada:') }}</span>
-                        <span>{{ $plannedShipment->planned_departure_date ? $plannedShipment->planned_departure_date->format('d/m/Y') : __('N/A') }}</span>
-                    </li>
-                   
-                    <li class="d-flex align-items-center mb-3">
-                        <i class="bx bx-box"></i><span class="fw-medium mx-2">{{ __('Peso Total:') }}</span>
-                        <span>{{ $plannedShipment->total_weight }} kg</span>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <i class="bx bx-cube"></i><span class="fw-medium mx-2">{{ __('Volume Total:') }}</span>
-                        <span>{{ $plannedShipment->total_volume }} m³</span>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <i class="bx bx-comment-detail"></i><span class="fw-medium mx-2">{{ __('Observações:') }}</span>
-                        <span>{{ $plannedShipment->remarks ?? __('N/A') }}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <!-- /About Planned Shipment Card -->
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">{{ __('Destinos da Carga') }}</h5>
-            </div>
-            <div class="card-body">
-                @php $dests = $plannedShipment->destinations ?? collect(); @endphp
-                @if($dests->count() > 0)
-                    @foreach($dests as $d)
-                        <div class="mb-3">
-                            <div class="fw-bold mb-4">{{ $d->address }}</div>
-                            <div class="text-muted mb-2"><i class="bx bx-user"></i> &nbsp; {{ $d->contact_name }}   •   <i class="bx bx-phone"></i> &nbsp;{{ $d->contact_phone }}</div>
-                            <div class="small mb-4"><i class="bx bx-calendar"></i> &nbsp;{{ $d->window_start ? $d->window_start->format('d/m/Y H:i') : '' }} - {{ $d->window_end ? $d->window_end->format('d/m/Y H:i') : '' }}</div>
-                            @php $dItems = $d->items ?? collect(); @endphp
-                            @if($dItems->count() > 0)
-                                <div class="table-responsive mt-2">
-                                  <table class="table table-sm">
-                                    <thead>
-                                      <tr>
-                                        <th>{{ __('Pedido') }}</th>
-                                        <th>{{ __('Produto') }}</th>
-                                        <th>{{ __('Descrição') }}</th>
-                                        <th>{{ __('Quantidade') }}</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      @foreach($dItems as $it)
-                                        <tr>
-                                          <td>{{ $it->sale_id }}</td>
-                                          <td>{{ optional($it->product)->name }}</td>
-                                          <td>{{ $it->description }}</td>
-                                          <td>{{ $it->quantity }}</td>
-                                        </tr>
-                                      @endforeach
-                                    </tbody>
-                                  </table>
-                                </div>
-                            @else
-                                <div class="text-muted">{{ __('Sem itens vinculados a este destino.') }}</div>
-                            @endif
+<div class="row g-4">
+    {{-- Shipment Info Card --}}
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h6 class="text-uppercase text-muted mb-4">
+                    <i class="bx bx-package me-2 text-danger"></i>{{ __('Informações da Carga') }}
+                </h6>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar rounded-circle bg-label-primary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="bx bx-hash"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Número da Carga') }}</small>
+                                <span class="fw-semibold">{{ $plannedShipment->shipment_number }}</span>
+                            </div>
                         </div>
-                        <hr/>
-                    @endforeach
-                @else
-                    <p>{{ __('Nenhum destino informado.') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar rounded-circle bg-label-info d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Saída Planejada') }}</small>
+                                <span class="fw-semibold">{{ $plannedShipment->planned_departure_date ? $plannedShipment->planned_departure_date->format('d/m/Y') : '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar rounded-circle bg-label-warning d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="bx bx-car"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Veículo') }}</small>
+                                <span class="fw-semibold">{{ $plannedShipment->vehicle->modelo ?? '-' }}</span>
+                                <small class="text-muted d-block">{{ $plannedShipment->vehicle->placa ?? '' }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar rounded-circle bg-label-secondary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="bx bx-user"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Motorista') }}</small>
+                                <span class="fw-semibold">{{ $plannedShipment->driver->full_name ?? '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px;">
+                                <i class="bx bx-box text-primary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Peso Total') }}</small>
+                                <span class="fw-semibold">{{ $plannedShipment->total_weight ? number_format($plannedShipment->total_weight, 2, ',', '.') . ' kg' : '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px;">
+                                <i class="bx bx-cube text-primary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Volume Total') }}</small>
+                                <span class="fw-semibold">{{ $plannedShipment->total_volume ? number_format($plannedShipment->total_volume, 2, ',', '.') . ' m³' : '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if($plannedShipment->remarks)
+                <hr class="my-4">
+                <h6 class="text-uppercase text-muted mb-3">
+                    <i class="bx bx-note me-2 text-danger"></i>{{ __('Observações') }}
+                </h6>
+                <p class="mb-0">{{ $plannedShipment->remarks }}</p>
                 @endif
             </div>
         </div>
-
     </div>
-    <!--/ Left Column: Planned Shipment Details -->
 
-    <!-- Right Column: Other Information -->
-    <div class="col-xl-4 col-lg-4 col-md-4 order-1 order-md-1">
-        <div class="card card-action mb-4">
-            <div class="card-header align-items-center">
-                <div class="card-action-element">
-                    <small class="card-text text-uppercase">{{ __('Outras Informações') }}</small>
-                    <ul class="list-unstyled mb-4 mt-3">
-                        <li class="d-flex align-items-center mb-3">
-                            <i class="bx bx-check"></i><span class="fw-medium mx-2">{{ __('Status:') }}</span>
-                            <span class="badge {{ $plannedShipment->status == 'Planned' ? 'bg-label-info' : ($plannedShipment->status == 'In Transit' ? 'bg-label-warning' : ($plannedShipment->status == 'Delivered' ? 'bg-label-success' : 'bg-label-danger')) }}">{{ __($plannedShipment->status) }}</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                            <i class="bx bx-calendar"></i><span class="fw-medium mx-2">{{ __('Criado em:') }}</span>
-                            <span>{{ $plannedShipment->created_at ? $plannedShipment->created_at->format('d/m/Y H:i:s') : '-' }}</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                            <i class="bx bx-calendar-check"></i><span class="fw-medium mx-2">{{ __('Atualizado em:') }}</span>
-                            <span>{{ $plannedShipment->updated_at ? $plannedShipment->updated_at->format('d/m/Y H:i:s') : '-' }}</span>
-                        </li>
-                    </ul>
+    {{-- Status & Dates Card --}}
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                {{-- Status --}}
+                <div class="text-center mb-4 pb-4 border-bottom">
+                    <div class="mb-3">
+                        @if($plannedShipment->status == 'Planned')
+                            <span class="badge bg-info rounded-pill px-4 py-2 fs-6">
+                                <i class="bx bx-calendar-check me-1"></i>{{ __('Planejado') }}
+                            </span>
+                        @elseif($plannedShipment->status == 'In Transit')
+                            <span class="badge bg-warning rounded-pill px-4 py-2 fs-6">
+                                <i class="bx bx-loader me-1"></i>{{ __('Em Trânsito') }}
+                            </span>
+                        @elseif($plannedShipment->status == 'Delivered')
+                            <span class="badge bg-success rounded-pill px-4 py-2 fs-6">
+                                <i class="bx bx-check-circle me-1"></i>{{ __('Entregue') }}
+                            </span>
+                        @elseif($plannedShipment->status == 'Returned')
+                            <span class="badge bg-primary rounded-pill px-4 py-2 fs-6">
+                                <i class="bx bx-undo me-1"></i>{{ __('Devolvido') }}
+                            </span>
+                        @else
+                            <span class="badge bg-danger rounded-pill px-4 py-2 fs-6">
+                                <i class="bx bx-x-circle me-1"></i>{{ __('Cancelado') }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+                
+                {{-- Timestamps --}}
+                <h6 class="text-uppercase text-muted mb-3">
+                    <i class="bx bx-time me-2 text-danger"></i>{{ __('Informações do Sistema') }}
+                </h6>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">{{ __('Criado em') }}</span>
+                    <span class="fw-semibold small">{{ $plannedShipment->created_at ? $plannedShipment->created_at->format('d/m/Y H:i') : '-' }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">{{ __('Atualizado em') }}</span>
+                    <span class="fw-semibold small">{{ $plannedShipment->updated_at ? $plannedShipment->updated_at->format('d/m/Y H:i') : '-' }}</span>
                 </div>
             </div>
         </div>
     </div>
-    <!--/ Right Column: Other Information -->
+</div>
+
+{{-- Destinations --}}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 py-3">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="bx bx-map text-danger me-2"></i>{{ __('Destinos da Carga') }}
+                </h6>
+            </div>
+            <div class="card-body">
+                @php $dests = $plannedShipment->destinations ?? collect(); @endphp
+                @if($dests->count() > 0)
+                    <div class="row g-4">
+                        @foreach($dests as $d)
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                                        <span class="fw-semibold">
+                                            <i class="bx bx-map-pin text-danger me-1"></i>
+                                            {{ __('Destino #') }}{{ $loop->iteration }}
+                                        </span>
+                                        <a href="{{ route('driver.destinations.show', $d->id) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="bx bx-show"></i>
+                                        </a>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="fw-semibold mb-2">{{ $d->address }}</p>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bx bx-user text-muted me-2"></i>
+                                            <span class="small">{{ $d->contact_name }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bx bx-phone text-muted me-2"></i>
+                                            <span class="small">{{ $d->contact_phone }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="bx bx-time text-muted me-2"></i>
+                                            <span class="small">{{ $d->window_start ? $d->window_start->format('d/m/Y H:i') : '' }} - {{ $d->window_end ? $d->window_end->format('d/m/Y H:i') : '' }}</span>
+                                        </div>
+                                        
+                                        @php $dItems = $d->items ?? collect(); @endphp
+                                        @if($dItems->count() > 0)
+                                            <hr>
+                                            <small class="text-muted d-block mb-2">{{ __('Itens') }}:</small>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-borderless mb-0">
+                                                    <tbody>
+                                                        @foreach($dItems as $it)
+                                                            <tr>
+                                                                <td class="py-1 px-0">
+                                                                    <span class="badge bg-light text-dark">#{{ $it->sale_id }}</span>
+                                                                </td>
+                                                                <td class="py-1">
+                                                                    <span class="small">{{ optional($it->product)->name ?? $it->description }}</span>
+                                                                </td>
+                                                                <td class="py-1 text-end">
+                                                                    <span class="badge bg-label-secondary">Qtd: {{ $it->quantity }}</span>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="bx bx-map-pin fs-1 text-muted opacity-50"></i>
+                        <p class="text-muted mt-2">{{ __('Nenhum destino informado.') }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

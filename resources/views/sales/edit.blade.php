@@ -3,14 +3,23 @@
 @section('title', __('Editar Venda'))
 
 @section('content')
+@php $canSeePrices = Auth::check() && Auth::user()->role_id == 1; @endphp
+
+{{-- Page Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">{{ __('Editar Venda') }} <span class="text-danger">#{{ $sale->erp_code }}</span></h4>
+        <p class="text-muted mb-0">{{ __('Atualize as informações da venda') }}</p>
+    </div>
+    <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bx bx-arrow-back me-1"></i> {{ __('Voltar') }}
+    </a>
+</div>
+
 <div class="row mb-6 gy-6">
     <div class="col-xl">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ __('Editar Venda') }}</h5>
-            </div>
+        <div class="card border-0 shadow-sm">
             <div class="card-body">
-                @php $canSeePrices = Auth::check() && Auth::user()->role_id == 1; @endphp
                 <form action="{{ route('sales.update', $sale->id) }}" method="POST">
                     @csrf
                     @method('PUT')
@@ -25,14 +34,14 @@
                                 @endforeach
                             </select>
                             @error('customer_id')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3 col-md-6">
                             <label for="issue_date" class="form-label">{{ __('Data da Venda') }} <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="issue_date" name="issue_date" value="{{ old('issue_date', $sale->issue_date->format('Y-m-d')) }}" required>
                             @error('issue_date')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -46,7 +55,7 @@
                                 @endforeach
                             </select>
                             @error('order_status')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3 col-md-4">
@@ -57,7 +66,7 @@
                                 @endforeach
                             </select>
                             @error('payment_status')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3 col-md-4">
@@ -68,17 +77,17 @@
                                 @endforeach
                             </select>
                             @error('payment_method')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
                     <div class="row mt-4">
                         <div class="col-12">
-                            <h5>{{ __('Itens da Venda') }}</h5>
+                            <h6 class="fw-semibold mb-3"><i class="bx bx-package text-danger me-2"></i>{{ __('Itens da Venda') }}</h6>
                             <div id="sale-items-container">
                                 @foreach($sale->saleItems as $index => $item)
-                                    <div class="row sale-item mb-3" data-item-id="{{ $item->id }}">
+                                    <div class="row sale-item mb-3 p-3 border rounded bg-light" data-item-id="{{ $item->id }}">
                                         <div class="mb-3 col-md-4">
                                             <label for="sale_items_{{ $index }}_product_id" class="form-label">{{ __('Produto') }} <span class="text-danger">*</span></label>
                                             <select class="form-select select2" id="sale_items_{{ $index }}_product_id" name="sale_items[{{ $index }}][product_id]" required>
@@ -103,12 +112,16 @@
                                         </div>
                                         @endif
                                         <div class="mb-3 col-md-2 d-flex align-items-end">
-                                            <button type="button" class="btn btn-danger remove-sale-item">{{ __('Remover') }}</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-sale-item">
+                                                <i class="bx bx-trash me-1"></i>{{ __('Remover') }}
+                                            </button>
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
-                            <button type="button" class="btn btn-primary" id="add-sale-item">{{ __('Adicionar Item') }}</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="add-sale-item">
+                                <i class="bx bx-plus me-1"></i>{{ __('Adicionar Item') }}
+                            </button>
                         </div>
                     </div>
 
@@ -117,7 +130,7 @@
                             <label for="notes" class="form-label">{{ __('Observações') }}</label>
                             <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes', $sale->notes) }}</textarea>
                             @error('notes')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -127,21 +140,23 @@
                             <label for="expected_delivery_date" class="form-label">{{ __('Entrega Prevista') }}</label>
                             <input type="date" class="form-control" id="expected_delivery_date" name="expected_delivery_date" value="{{ old('expected_delivery_date', $sale->expected_delivery_date ? $sale->expected_delivery_date->format('Y-m-d') : '') }}">
                             @error('expected_delivery_date')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3 col-md-6" id="actual_delivery_date_field">
                             <label for="actual_delivery_date" class="form-label">{{ __('Data Real de Entrega') }}</label>
                             <input type="date" class="form-control" id="actual_delivery_date" name="actual_delivery_date" value="{{ old('actual_delivery_date', $sale->actual_delivery_date ? $sale->actual_delivery_date->format('Y-m-d') : '') }}">
                             @error('actual_delivery_date')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-success me-2">{{ __('Atualizar') }}</button>
-                        <a href="{{ route('sales.index') }}" class="btn btn-secondary">{{ __('Cancelar') }}</a>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-secondary">{{ __('Cancelar') }}</a>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bx bx-save me-1"></i> {{ __('Atualizar') }}
+                        </button>
                     </div>
                 </form>
             </div>
@@ -185,7 +200,7 @@
 
         $('#add-sale-item').on('click', function () {
             const newItemHtml = `
-                <div class="row sale-item mb-3">
+                <div class="row sale-item mb-3 p-3 border rounded bg-light">
                     <div class="mb-3 col-md-4">
                         <label for="sale_items_${itemIndex}_product_id" class="form-label">{{ __('Produto') }} <span class="text-danger">*</span></label>
                         <select class="form-select" id="sale_items_${itemIndex}_product_id" name="sale_items[${itemIndex}][product_id]" required>
@@ -216,7 +231,9 @@
                         <input type="number" class="form-control" id="sale_items_${itemIndex}_item_discount" name="sale_items[${itemIndex}][item_discount]" value="0.00" step="0.01" min="0">
                     </div>
                     <div class="mb-3 col-md-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger remove-sale-item">{{ __('Remover') }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-sale-item">
+                            <i class="bx bx-trash me-1"></i>{{ __('Remover') }}
+                        </button>
                     </div>
                 </div>
             `;

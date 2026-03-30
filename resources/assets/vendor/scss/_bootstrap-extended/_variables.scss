@@ -57,11 +57,17 @@ $grays: (
 // scss-docs-end gray-colors-map
 
 // scss-docs-start color-variables
+// Bassani Móveis Color Palette
+$bassani-red: #DE0802 !default;
+$bassani-red-dark: #B3211A !default;
+$bassani-navy: #1F2A44 !default;
+$bassani-gray: #D2D4DA !default;
+
 $blue: #007bff !default;
 $indigo: #6610f2 !default;
-$purple: #696cff !default;
+$purple: $bassani-red !default;
 $pink: #e83e8c !default;
-$red: #ff3e1d !default;
+$red: $bassani-red !default;
 $orange: #fd7e14 !default;
 $yellow: #ffab00 !default;
 $green: #71dd37 !default;
@@ -78,14 +84,14 @@ $color-contrast-light: $white !default;
 $color-contrast-dark: $pure-black !default;
 
 // scss-docs-start theme-color-variables
-$primary: $purple !default;
-$secondary: #8592a3 !default;
+$primary: $bassani-red !default;
+$secondary: $bassani-navy !default;
 $success: $green !default;
 $info: $cyan !default;
 $warning: $yellow !default;
-$danger: $red !default;
-$light: #dbdee0 !default;
-$dark: #2b2c40 !default;
+$danger: $bassani-red-dark !default;
+$light: $bassani-gray !default;
+$dark: $bassani-navy !default;
 $gray: $gray-500 !default; // (C)
 
 // scss-docs-end theme-color-variables

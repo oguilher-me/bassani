@@ -1,39 +1,51 @@
 @extends('layouts/contentNavbarLayout')
 
 @section('title', __('Cadastro de Cargas Planejadas'))
- 
-@section('content')
-<div class="row mb-6 gy-6">
-    <div class="col-xl"> 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ __('Cadastro de Cargas Planejadas') }}</h5>
-            </div> 
-            <div class="card-body">
 
-                  @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+@section('content')
+{{-- Page Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">{{ __('Cadastro de Cargas Planejadas') }}</h4>
+        <p class="text-muted mb-0">{{ __('Planejar nova carga e destinos') }}</p>
+    </div>
+    <a href="{{ route('planned_shipments.index') }}" class="btn btn-outline-secondary">
+        <i class="bx bx-arrow-back me-1"></i> {{ __('Voltar') }}
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                @if ($errors->any())
+                    <div class="alert alert-danger border-0">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form action="{{ route('planned_shipments.store') }}" method="POST">
                     @csrf
 
-                    <div class="row">
-                        <div class="mb-3 col-md-6">
+                    {{-- Dados da Carga --}}
+                    <h6 class="text-uppercase text-muted mb-3">
+                        <i class="bx bx-package me-2 text-danger"></i>{{ __('Dados da Carga') }}
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
                             <label for="shipment_number" class="form-label">{{ __('Número da Carga') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="shipment_number" name="shipment_number" value="{{ old('shipment_number') }}" required>
                             @error('shipment_number')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="mb-3 col-md-6">
+                        <div class="col-md-4">
                             <label for="status" class="form-label">{{ __('Status') }} <span class="text-danger">*</span></label>
-                            <select class="form-select select2" id="status" name="status" required>
+                            <select class="form-select" id="status" name="status" required>
                                 <option value="Planned" {{ old('status') == 'Planned' ? 'selected' : '' }}>{{ __('Planejada') }}</option>
                                 <option value="In Transit" {{ old('status') == 'In Transit' ? 'selected' : '' }}>{{ __('Em Transporte') }}</option>
                                 <option value="Delivered" {{ old('status') == 'Delivered' ? 'selected' : '' }}>{{ __('Entregue') }}</option>
@@ -41,114 +53,143 @@
                                 <option value="Cancelled" {{ old('status') == 'Cancelled' ? 'selected' : '' }}>{{ __('Cancelada') }}</option>
                             </select>
                             @error('status')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="planned_departure_date" class="form-label">{{ __('Data de Saída Planejada') }} <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="planned_departure_date" name="planned_departure_date" value="{{ old('planned_departure_date') }}" required>
+                            @error('planned_departure_date')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="mb-3 col-md-6">
+                    <hr class="my-4">
+
+                    {{-- Veículo e Motorista --}}
+                    <h6 class="text-uppercase text-muted mb-3">
+                        <i class="bx bx-car me-2 text-danger"></i>{{ __('Veículo e Motorista') }}
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
                             <label for="vehicle_id" class="form-label">{{ __('Veículo') }} <span class="text-danger">*</span></label>
-                            <select class="form-select select2" id="vehicle_id" name="vehicle_id">
+                            <select class="form-select" id="vehicle_id" name="vehicle_id">
                                 <option value="">{{ __('Selecione um veículo') }}</option>
                                 @foreach($vehicles as $vehicle)
                                     <option value="{{ $vehicle->id }}" {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>{{ $vehicle->modelo }} ({{ $vehicle->placa }})</option>
                                 @endforeach
                             </select>
                             @error('vehicle_id')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="mb-3 col-md-6">
+                        <div class="col-md-6">
                             <label for="driver_id" class="form-label">{{ __('Motorista') }} <span class="text-danger">*</span></label>
-                            <select class="form-select select2" id="driver_id" name="driver_id">
+                            <select class="form-select" id="driver_id" name="driver_id">
                                 <option value="">{{ __('Selecione um motorista') }}</option>
                                 @foreach($drivers as $driver)
                                     <option value="{{ $driver->id }}" {{ old('driver_id') == $driver->id ? 'selected' : '' }}>{{ $driver->full_name }}</option>
                                 @endforeach
                             </select>
                             @error('driver_id')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="mb-3 col-md-3">
-                            <label for="planned_departure_date" class="form-label">{{ __('Data de Saída Planejada') }} <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="planned_departure_date" name="planned_departure_date" value="{{ old('planned_departure_date') }}" required>
-                            @error('planned_departure_date')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    
-                        <div class="mb-3 col-md-3">
+                    <hr class="my-4">
+
+                    {{-- Peso e Volume --}}
+                    <h6 class="text-uppercase text-muted mb-3">
+                        <i class="bx bx-box me-2 text-danger"></i>{{ __('Peso e Volume') }}
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
                             <label for="total_weight" class="form-label">{{ __('Peso Total (kg)') }}</label>
-                            <input type="number" class="form-control" id="total_weight" name="total_weight" value="{{ old('total_weight') }}" step="0.01">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="total_weight" name="total_weight" value="{{ old('total_weight') }}" step="0.01">
+                                <span class="input-group-text">kg</span>
+                            </div>
                             @error('total_weight')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
-
-                        <div class="mb-3 col-md-3">
+                        <div class="col-md-4">
                             <label for="total_volume" class="form-label">{{ __('Volume Total (m³)') }}</label>
-                            <input type="number" class="form-control" id="total_volume" name="total_volume" value="{{ old('total_volume') }}" step="0.01">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="total_volume" name="total_volume" value="{{ old('total_volume') }}" step="0.01">
+                                <span class="input-group-text">m³</span>
+                            </div>
                             @error('total_volume')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="remarks" class="form-label">{{ __('Observações') }}</label>
+                            <input type="text" class="form-control" id="remarks" name="remarks" value="{{ old('remarks') }}">
+                            @error('remarks')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="remarks" class="form-label">{{ __('Observações') }}</label>
-                        <textarea class="form-control" id="remarks" name="remarks" rows="3">{{ old('remarks') }}</textarea>
-                        @error('remarks')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    <hr class="my-4">
 
-                    
-
-                    <div class="mb-3">
-                        <h5 class="mb-4 mt-4">{{ __('Destinos das Cargas') }}</h5>
-                        <div id="destinations-wrapper">
-                            <div class="card mb-2 destination-card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <span>{{ __('Destino #1') }}</span>
-                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove-destination">{{ __('Remover') }}</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-2">
-                                        <div class="col-md-8">
-                                            <input type="text" name="destinations_addresses[]" class="form-control" placeholder="Endereço completo">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" name="destinations_contact_names[]" class="form-control" placeholder="Contato direto">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" name="destinations_contact_phones[]" class="form-control" placeholder="Telefone">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="datetime-local" name="destinations_window_starts[]" class="form-control" placeholder="Início da janela">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="datetime-local" name="destinations_window_ends[]" class="form-control" placeholder="Fim da janela">
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label mt-2">{{ __('Itens para este destino') }}</label>
-                                            <select class="form-select select2 dest-items-select" name="destinations_items[0][]" multiple="multiple"></select>
-                                        </div>
+                    {{-- Destinos --}}
+                    <h6 class="text-uppercase text-muted mb-3">
+                        <i class="bx bx-map me-2 text-danger"></i>{{ __('Destinos da Carga') }}
+                    </h6>
+                    <div id="destinations-wrapper" class="mb-3">
+                        <div class="card border-0 shadow-sm mb-3 destination-card">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                                <span class="fw-semibold"><i class="bx bx-map-pin me-1 text-danger"></i> {{ __('Destino #1') }}</span>
+                                <button type="button" class="btn btn-outline-danger btn-sm btn-remove-destination">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label">{{ __('Endereço Completo') }}</label>
+                                        <input type="text" name="destinations_addresses[]" class="form-control" placeholder="Endereço completo">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ __('Contato Direto') }}</label>
+                                        <input type="text" name="destinations_contact_names[]" class="form-control" placeholder="Nome do contato">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ __('Telefone') }}</label>
+                                        <input type="text" name="destinations_contact_phones[]" class="form-control" placeholder="(00) 00000-0000">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ __('Início da Janela') }}</label>
+                                        <input type="datetime-local" name="destinations_window_starts[]" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ __('Fim da Janela') }}</label>
+                                        <input type="datetime-local" name="destinations_window_ends[]" class="form-control">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">{{ __('Itens para este destino') }}</label>
+                                        <select class="form-select select2 dest-items-select" name="destinations_items[0][]" multiple="multiple"></select>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button type="button" id="btn-add-destination" class="btn btn-outline-primary">{{ __('Adicionar destino') }}</button>
                     </div>
+                    <button type="button" id="btn-add-destination" class="btn btn-outline-primary mb-4">
+                        <i class="bx bx-plus me-1"></i> {{ __('Adicionar destino') }}
+                    </button>
 
-
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-success me-2">{{ __('Salvar') }}</button>
-                        <a href="{{ route('planned_shipments.index') }}" class="btn btn-secondary">{{ __('Cancelar') }}</a>
+                    {{-- Actions --}}
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{{ route('planned_shipments.index') }}" class="btn btn-outline-secondary">
+                            <i class="bx bx-x me-1"></i> {{ __('Cancelar') }}
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-check me-1"></i> {{ __('Salvar Carga') }}
+                        </button>
                     </div>
                 </form>
             </div>
@@ -160,30 +201,53 @@
 @section('page-script')
 <script type="module">
   $(function() {
-
     const tmpl = (idx) => `
-    <div class="card mb-2 destination-card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Destino #${idx+1}</span>
-        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-destination">Remover</button>
+    <div class="card border-0 shadow-sm mb-3 destination-card">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <span class="fw-semibold"><i class="bx bx-map-pin me-1 text-danger"></i> Destino #${idx+1}</span>
+        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-destination">
+            <i class="bx bx-trash"></i>
+        </button>
       </div>
       <div class="card-body">
-        <div class="row g-2">
-          <div class="col-md-8"><input type="text" name="destinations_addresses[]" class="form-control" placeholder="Endereço completo"></div>
-          <div class="col-md-4"><input type="text" name="destinations_contact_names[]" class="form-control" placeholder="Contato direto"></div>
-          <div class="col-md-4"><input type="text" name="destinations_contact_phones[]" class="form-control" placeholder="Telefone"></div>
-          <div class="col-md-4"><input type="datetime-local" name="destinations_window_starts[]" class="form-control" placeholder="Início da janela"></div>
-          <div class="col-md-4"><input type="datetime-local" name="destinations_window_ends[]" class="form-control" placeholder="Fim da janela"></div>
-          <div class="col-12"><label class="form-label mt-2">Itens para este destino</label><select class="form-select select2 dest-items-select" name="destinations_items[${idx}][]" multiple="multiple"></select></div>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Endereço Completo</label>
+            <input type="text" name="destinations_addresses[]" class="form-control" placeholder="Endereço completo">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Contato Direto</label>
+            <input type="text" name="destinations_contact_names[]" class="form-control" placeholder="Nome do contato">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Telefone</label>
+            <input type="text" name="destinations_contact_phones[]" class="form-control" placeholder="(00) 00000-0000">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Início da Janela</label>
+            <input type="datetime-local" name="destinations_window_starts[]" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Fim da Janela</label>
+            <input type="datetime-local" name="destinations_window_ends[]" class="form-control">
+          </div>
+          <div class="col-12">
+            <label class="form-label mt-2">Itens para este destino</label>
+            <select class="form-select select2 dest-items-select" name="destinations_items[${idx}][]" multiple="multiple"></select>
+          </div>
         </div>
       </div>
     </div>`;
+    
     let destIndex = 0;
+    
     const populateItemsOptions = (selectEl) => {
       const optionsHtml = $('#items-options-template').html();
       $(selectEl).html(optionsHtml).trigger('change');
     };
+    
     populateItemsOptions($('.dest-items-select'));
+    
     $('#btn-add-destination').on('click', function(){
       destIndex++;
       const node = $(tmpl(destIndex));
@@ -191,6 +255,7 @@
       node.find('.select2').select2();
       populateItemsOptions(node.find('.dest-items-select'));
     });
+    
     $(document).on('click', '.btn-remove-destination', function(){
       $(this).closest('.destination-card').remove();
     });

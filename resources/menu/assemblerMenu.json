@@ -1,0 +1,37 @@
+{
+  "menu": [
+    {
+      "menuHeader": "Montador"
+    },
+    {
+      "name": "Início",
+      "icon": "bx bx-home",
+      "url": "/assembler/home",
+      "slug": "assembler-home"
+    },
+    {
+      "name": "Meu Ponto",
+      "icon": "bx bx-time-five",
+      "url": "/meu-ponto",
+      "slug": "meu-ponto"
+    },
+    {
+      "name": "Minha Agenda",
+      "icon": "bx bx-calendar-alt",
+      "url": "/my-schedule",
+      "slug": "assembler-my-schedule"
+    },
+    {
+      "name": "Lançar Despesa",
+      "icon": "bx bx-plus-circle",
+      "url": "/assembler/expenses/create",
+      "slug": "assembler-expenses-create"
+    },
+    {
+      "name": "Minhas Despesas",
+      "icon": "bx bx-receipt",
+      "url": "/assembler/expenses",
+      "slug": "assembler-expenses"
+    }
+  ]
+}

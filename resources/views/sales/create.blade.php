@@ -3,12 +3,20 @@
 @section('title', __('Cadastro de Venda'))
 
 @section('content')
+{{-- Page Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">{{ __('Cadastro de Venda') }}</h4>
+        <p class="text-muted mb-0">{{ __('Registre uma nova venda no sistema') }}</p>
+    </div>
+    <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bx bx-arrow-back me-1"></i> {{ __('Voltar') }}
+    </a>
+</div>
+
 <div class="row mb-6 gy-6">
     <div class="col-xl">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ __('Cadastro de Venda') }}</h5>
-            </div>
+        <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <form action="{{ route('sales.store') }}" method="POST">
                     @csrf
@@ -23,14 +31,14 @@
                                 @endforeach
                             </select>
                             @error('customer_id')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3 col-md-6">
                             <label for="sale_date" class="form-label">{{ __('Data da Venda') }} <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="sale_date" name="sale_date" value="{{ old('sale_date', date('Y-m-d')) }}" required>
                             @error('sale_date')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -44,7 +52,7 @@
                                 @endforeach
                             </select>
                             @error('order_status')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3 col-md-4">
@@ -55,7 +63,7 @@
                                 @endforeach
                             </select>
                             @error('payment_status')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3 col-md-4">
@@ -66,7 +74,7 @@
                                 @endforeach
                             </select>
                             @error('payment_method')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -74,10 +82,9 @@
                     {{-- Placeholder for Sale Items --}}
                     <div class="row mt-4">
                         <div class="col-12">
-                            <h5>{{ __('Itens da Venda') }}</h5>
-                            <div id="sale-items-container">
-                                {{-- Sale items will be added here dynamically --}}
-                                <p>{{ __('Funcionalidade de adicionar itens será implementada aqui.') }}</p>
+                            <h6 class="fw-semibold mb-3"><i class="bx bx-package text-danger me-2"></i>{{ __('Itens da Venda') }}</h6>
+                            <div id="sale-items-container" class="border rounded p-3 bg-light">
+                                <p class="text-muted mb-0">{{ __('Funcionalidade de adicionar itens será implementada aqui.') }}</p>
                             </div>
                         </div>
                     </div>
@@ -87,14 +94,16 @@
                             <label for="notes" class="form-label">{{ __('Observações') }}</label>
                             <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
                             @error('notes')
-                                <div class="text-danger">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-success me-2">{{ __('Salvar') }}</button>
-                        <a href="{{ route('sales.index') }}" class="btn btn-secondary">{{ __('Cancelar') }}</a>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-secondary">{{ __('Cancelar') }}</a>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bx bx-save me-1"></i> {{ __('Salvar') }}
+                        </button>
                     </div>
                 </form>
             </div>

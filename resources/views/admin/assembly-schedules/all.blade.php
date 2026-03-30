@@ -2,131 +2,165 @@
 
 @section('title', __('Agendamentos de Montagem'))
 
-@section('vendor-style')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-@endsection
-
-@section('vendor-script')
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-@endsection
-
 @section('content')
-<div class="row mb-6 gy-6">
-    <div class="col-xl">
-        <div class="card"> 
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ __('Agenda de Montagem') }}</h5>
+{{-- Page Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">{{ __('Agenda de Montagem') }}</h4>
+        <p class="text-muted mb-0">{{ __('Calendário e agendamentos de montagem') }}</p>
+    </div>
+</div>
+
+{{-- Alerts --}}
+@if (session('success'))
+    <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if ($errors->any())
+    <div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-2"></i>
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+{{-- Filter Card --}}
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form id="filter-form" class="filter-form row g-3" action="{{ route('assembly-schedules.all') }}" method="GET">
+            @if (Auth::check() && Auth::user()->role_id != 4)
+                <div class="col-md-3">
+                    <label for="assembler_id" class="form-label">{{ __('Montador') }}</label>
+                    <select name="assembler_id" id="assembler_id" class="form-select">
+                        <option value="">{{ __('Todos') }}</option>
+                        @foreach ($assemblers as $assembler)
+                            <option value="{{ $assembler->id }}" {{ request('assembler_id') == $assembler->id ? 'selected' : '' }}>{{ $assembler->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+            <div class="col-md-3">
+                <label for="date" class="form-label">{{ __('Data') }}</label>
+                <input type="date" name="date" id="date" class="form-control" value="{{ request('date') }}">
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">{{ __('Status de Confirmação') }}</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">{{ __('Todos') }}</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __('Pendente') }}</option>
+                    <option value="started" {{ request('status') == 'started' ? 'selected' : '' }}>{{ __('Em Andamento') }}</option>
+                    <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>{{ __('Confirmado') }}</option>
+                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>{{ __('Cancelado') }}</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bx bx-filter me-1"></i> {{ __('Filtrar') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    {{-- Calendar --}}
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 py-3">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="bx bx-calendar text-danger me-2"></i>{{ __('Calendário de Agendamentos') }}
+                </h6>
             </div>
             <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
+                <div id="calendar" style="min-height: 500px"></div>
+            </div>
+        </div>
+    </div>
 
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+    {{-- Schedules List --}}
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="bx bx-list-check text-danger me-2"></i>{{ __('Agendamentos') }}
+                </h6>
+                <span class="badge bg-label-primary">{{ $schedules->count() }}</span>
+            </div>
+            <div class="card-body p-0">
+                @if ($schedules->isEmpty())
+                    <div class="text-center py-5">
+                        <i class="bx bx-calendar-x fs-1 text-muted opacity-50"></i>
+                        <p class="text-muted mt-2">{{ __('Nenhum agendamento encontrado') }}</p>
                     </div>
-                @endif
-               
-                <form id="filter-form" class="filter-form" action="{{ route('assembly-schedules.all') }}" method="GET">
-                    <div class="row">
-                        @if (Auth::check() && Auth::user()->role_id != 4)
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="assembler_id">Montador:</label>
-                                    <select name="assembler_id" id="assembler_id" class="form-control">
-                                        <option value="">Todos</option>
-                                        @foreach ($assemblers as $assembler)
-                                            <option value="{{ $assembler->id }}" {{ request('assembler_id') == $assembler->id ? 'selected' : '' }}>{{ $assembler->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        @endif
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="date">Data:</label>
-                                <input type="date" name="date" id="date" class="form-control" value="{{ request('date') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="status">Status de Confirmação:</label>
-                                <select name="status" id="status" class="form-control">
-                                    <option value="">Todos</option>
-                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pendente</option>
-                                    <option value="started" {{ request('status') == 'started' ? 'selected' : '' }}>Em Andamento</option>
-                                    <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmado</option>
-                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelado</option>
-                                </select>
-                            </div>
-                        </div>
-                    
-                        <div class="col-md-3">
-                            <label>&nbsp;</label>
-                            <button type="submit" class="btn btn-primary">Filtrar</button>
+                @else
+                    @php
+                        $groupedSchedules = $schedules->groupBy(function($item) {
+                            return \Carbon\Carbon::parse($item->scheduled_date)->format('Y-m-d');
+                        });
+                    @endphp
 
-                        </div>
-                </form>
-                 
-                <div class="row">
-                    <div class="col-md-8">
-                        <h5 class="mb-0">{{ __('Calendário de Agendamentos') }}</h5>
-                
-                        <div id='calendar'></div>
-                    </div>
-                   
-                    <div class="col-md-4">
-                        
-                                <h5 class="mb-0">{{ __('Agendamentos') }}</h5>
-                           
-                                @if ($schedules->isEmpty())
-                                    <p>Nenhum agendamento encontrado com os filtros aplicados.</p>
-                                @else
-                                    @php
-                                        $groupedSchedules = $schedules->groupBy(function($item) {
-                                            return \Carbon\Carbon::parse($item->scheduled_date)->format('Y-m-d');
-                                        });
-                                    @endphp
-
-                                    @foreach ($groupedSchedules as $date => $dailySchedules)
-                                        <div class="mb-3">
-                                            <h5>{{ \Carbon\Carbon::parse($date)->format('d/m/Y') }}</h5>
-                                            <ul class="list-group">
-                                                @foreach ($dailySchedules as $schedule)
-                                                    <li class="list-group-item">
-                                                        <strong>Horário:</strong> {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}<br>
-                                                        <strong>Cliente:</strong> @if($schedule->sale->customer->customer_type == 'PF'){{ $schedule->sale->customer->full_name ?? 'N/A' }}@else{{ $schedule->sale->customer->company_name ?? 'N/A' }}@endif<br>
-                                                        <strong>Montador(es):</strong>
-                                                        @foreach ($schedule->assemblers as $assembler)
-                                                            {{ $assembler->name }} ({{ ucfirst($assembler->pivot->confirmation_status) }})<br>
-                                                        @endforeach
-                                                        <strong>Status:</strong>
-                                                        @foreach ($schedule->assemblers as $assembler)
-                                                            {{ ucfirst($assembler->pivot->confirmation_status) }}<br>
-                                                        @endforeach
-                                                        <strong>Observações:</strong>
-                                                        @foreach ($schedule->assemblers as $assembler)
-                                                            {{ $assembler->pivot->assembler_notes ?? 'N/A' }}<br>
-                                                        @endforeach
-                                                        <a href="{{ route('assembly-schedules.showDetails', $schedule->id) }}" class="btn btn-sm btn-primary mt-2">Ver Detalhes</a>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
+                    <div class="list-group list-group-flush">
+                        @foreach ($groupedSchedules as $date => $dailySchedules)
+                            <div class="list-group-item bg-light py-2">
+                                <span class="fw-semibold text-danger">
+                                    <i class="bx bx-calendar me-1"></i>
+                                    {{ \Carbon\Carbon::parse($date)->format('d/m/Y') }}
+                                </span>
+                            </div>
+                            @foreach ($dailySchedules as $schedule)
+                                <div class="list-group-item border-start-0 border-end-0 py-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge bg-label-info rounded-pill px-2 py-1 small">
+                                            <i class="bx bx-time-five me-1"></i>
+                                            {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="avatar rounded-circle bg-label-primary d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                            <i class="bx bx-user"></i>
                                         </div>
-                                    @endforeach
-                                @endif
-                           
+                                        <div>
+                                            <small class="text-muted d-block">{{ __('Cliente') }}</small>
+                                            <span class="fw-semibold small">
+                                                @if($schedule->sale->customer->customer_type == 'PF')
+                                                    {{ $schedule->sale->customer->full_name ?? 'N/A' }}
+                                                @else
+                                                    {{ $schedule->sale->customer->company_name ?? 'N/A' }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="avatar rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                            <i class="bx bx-wrench text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted d-block">{{ __('Montadores') }}</small>
+                                            <span class="small">
+                                                @foreach ($schedule->assemblers as $assembler)
+                                                    {{ $assembler->name }}@if(!$loop->last), @endif
+                                                @endforeach
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <a href="{{ route('assembly-schedules.showDetails', $schedule->id) }}" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="bx bx-show me-1"></i> {{ __('Ver Detalhes') }}
+                                    </a>
+                                </div>
+                            @endforeach
+                        @endforeach
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -134,6 +168,31 @@
 @endsection
 
 @section('page-script')
+<style>
+    .fc .fc-button-primary {
+        background-color: #DE0802;
+        border-color: #DE0802;
+    }
+    .fc .fc-button-primary:hover {
+        background-color: #B3211A;
+        border-color: #B3211A;
+    }
+    .fc .fc-button-primary:disabled {
+        background-color: #DE0802;
+        border-color: #DE0802;
+        opacity: 0.6;
+    }
+    .fc .fc-day-today {
+        background-color: rgba(222, 8, 2, 0.05) !important;
+    }
+    .fc-event {
+        cursor: pointer;
+    }
+    .fc-event.success { background-color: #1cc88a; border-color: #1cc88a; }
+    .fc-event.warning { background-color: #f6c23e; border-color: #f6c23e; }
+    .fc-event.danger { background-color: #e74a3b; border-color: #e74a3b; }
+    .fc-event.info { background-color: #36b9cc; border-color: #36b9cc; }
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/pt-br.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
@@ -170,37 +229,37 @@
                         if (assemblerIdElement) {
                             params.assembler_id = assemblerIdElement.value;
                         } else {
-                            params.assembler_id = ''; // Ou defina um valor padrão apropriado, se necessário
+                            params.assembler_id = '';
                         }
                     }
-                    console.log('FullCalendar sending params:', params);
                     return params;
                 },
                 failure: function() {
-                    alert('Houve um erro ao carregar os agendamentos!');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Houve um erro ao carregar os agendamentos!',
+                        confirmButtonColor: '#DE0802'
+                    });
                 },
                 success: function(response) {
-                    console.log('FullCalendar received events:', response);
-                    return response; // Assuming the response is already an array of event objects
+                    return response;
                 }
             },
             eventClick: function(info) {
-                    // Populate modal with event data
-                    document.getElementById('modalTitle').innerText = info.event.title;
-                    document.getElementById('modalCustomerName').innerText = info.event.extendedProps.customer_name;
-                    document.getElementById('modalProductName').innerText = info.event.extendedProps.product_name;
-                    document.getElementById('modalStart').innerText = moment(info.event.start).format('DD/MM/YYYY HH:mm');
-                    document.getElementById('modalEnd').innerText = moment(info.event.end).format('DD/MM/YYYY HH:mm');
-                    document.getElementById('modalNotes').innerText = info.event.extendedProps.assemblers.map(a => a.assembler_notes ?? 'N/A').join(', ');
-                    document.getElementById('modalAssemblers').innerText = info.event.extendedProps.assemblers.map(a => a.name).join(', ');
-                    document.getElementById('modalStatus').innerText = info.event.extendedProps.assemblers.map(a => a.confirmation_status).join(', ');
-                    document.getElementById('modalSaleId').innerText = info.event.extendedProps.sale_id;
+                document.getElementById('modalTitle').innerText = info.event.title;
+                document.getElementById('modalCustomerName').innerText = info.event.extendedProps.customer_name;
+                document.getElementById('modalProductName').innerText = info.event.extendedProps.product_name;
+                document.getElementById('modalStart').innerText = moment(info.event.start).format('DD/MM/YYYY HH:mm');
+                document.getElementById('modalEnd').innerText = info.event.end ? moment(info.event.end).format('DD/MM/YYYY HH:mm') : '-';
+                document.getElementById('modalNotes').innerText = info.event.extendedProps.assemblers.map(a => a.assembler_notes ?? 'N/A').join(', ');
+                document.getElementById('modalAssemblers').innerText = info.event.extendedProps.assemblers.map(a => a.name).join(', ');
+                document.getElementById('modalStatus').innerText = info.event.extendedProps.assemblers.map(a => a.confirmation_status).join(', ');
+                document.getElementById('modalSaleId').innerText = info.event.extendedProps.sale_id;
 
-                    // Display the modal
-                    document.getElementById('scheduleSideModal').style.display = 'block';
-                },
+                document.getElementById('scheduleSideModal').style.display = 'block';
+            },
             eventDidMount: function(info) {
-                // Tooltip for events
                 $(info.el).tooltip({
                     title: info.event.title,
                     placement: 'top',
@@ -216,16 +275,63 @@
         const sideModal = `
             <div id="scheduleSideModal" class="side-modal">
                 <div class="side-modal-content">
-                    <span class="close-button">\u0026times;</span>
-                    <h5 style="font-weight: 700;" id="modalTitle"></h5>
-                    <p><strong>Cliente:</strong> <span id="modalCustomerName"></span></p>
-                    <p><strong>Produto:</strong> <span id="modalProductName"></span></p>
-                    <p><strong>Início:</strong> <span id="modalStart"></span></p>
-                    <p><strong>Fim:</strong> <span id="modalEnd"></span></p>
-                    <p><strong>Notas:</strong> <span id="modalNotes"></span></p>
-                    <p><strong>Montadores:</strong> <span id="modalAssemblers"></span></p>
-                    <p><strong>Status:</strong> <span id="modalStatus"></span></p>
-                    <p><strong>ID da Venda:</strong> <span id="modalSaleId"></span></p>
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <h5 class="mb-0 fw-bold" id="modalTitle"></h5>
+                        <span class="close-button fs-3">&times;</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar rounded-circle bg-label-primary d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="bx bx-user"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Cliente') }}</small>
+                                <span class="fw-semibold" id="modalCustomerName"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar rounded-circle bg-label-info d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="bx bx-package"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">{{ __('Produto') }}</small>
+                                <span class="fw-semibold" id="modalProductName"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted d-block">{{ __('Início') }}</small>
+                            <span class="fw-semibold" id="modalStart"></span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">{{ __('Fim') }}</small>
+                            <span class="fw-semibold" id="modalEnd"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">{{ __('Montadores') }}</small>
+                        <span id="modalAssemblers"></span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">{{ __('Status') }}</small>
+                        <span id="modalStatus"></span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">{{ __('Notas') }}</small>
+                        <span id="modalNotes"></span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">{{ __('ID da Venda') }}</small>
+                        <span class="fw-semibold" id="modalSaleId"></span>
+                    </div>
+                    <div class="mt-4 pt-3 border-top">
+                        <a id="modalDetailLink" href="#" class="btn btn-primary w-100">
+                            <i class="bx bx-show me-1"></i>{{ __('Ver Detalhes') }}
+                        </a>
+                    </div>
                 </div>
             </div>
         `;
@@ -234,67 +340,53 @@
         // Side Modal CSS
         const sideModalCss = `
             .side-modal {
-                display: none; /* Hidden by default */
-                position: fixed; /* Stay in place */
-                z-index: 1050; /* Sit on top */
+                display: none;
+                position: fixed;
+                z-index: 1050;
                 left: 0;
                 top: 0;
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                overflow: auto; /* Enable scroll if needed */
-                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0,0,0,0.4);
             }
             .side-modal-content {
-                background-color: #fefefe;
-                margin: auto;
+                background-color: #fff;
+                margin: 0;
                 padding: 20px;
-                border: 1px solid #888;
-                width: 30%; /* Adjust as needed */
+                border: none;
+                width: 350px;
                 height: 100%;
                 position: absolute;
                 right: 0;
                 top: 0;
-                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-                -webkit-animation-name: slideIn;
-                -webkit-animation-duration: 0.4s;
+                box-shadow: -4px 0 15px rgba(0,0,0,0.1);
                 animation-name: slideIn;
-                animation-duration: 0.4s
+                animation-duration: 0.3s;
+                overflow-y: auto;
             }
             .close-button {
                 color: #aaa;
-                float: right;
-                font-size: 28px;
-                font-weight: bold;
-            }
-            .close-button:hover,
-            .close-button:focus {
-                color: black;
-                text-decoration: none;
                 cursor: pointer;
+                transition: color 0.2s;
             }
-            @-webkit-keyframes slideIn {
-                from {right: -300px; opacity: 0}
-                to {right: 0; opacity: 1}
+            .close-button:hover {
+                color: #DE0802;
             }
             @keyframes slideIn {
-                from {right: -300px; opacity: 0}
-                to {right: 0; opacity: 1}
+                from { right: -350px; opacity: 0; }
+                to { right: 0; opacity: 1; }
             }
         `;
         $('head').append('<style type="text/css">' + sideModalCss + '</style>');
 
-        // Get the modal
         const modal = document.getElementById("scheduleSideModal");
-
-        // Get the <span> element that closes the modal
         const span = document.getElementsByClassName("close-button")[0];
 
-        // When the user clicks on <span> (x), close the modal
         span.onclick = function() {
             modal.style.display = "none";
         }
 
-        // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
@@ -302,7 +394,6 @@
         }
 
         if (userType != 'Montador') {
-            // Recarregar eventos quando os filtros mudarem
             document.getElementById('assembler_id').addEventListener('change', function() {
                 calendar.refetchEvents();
             });
@@ -314,12 +405,9 @@
             calendar.refetchEvents();
         });
 
-        // Adicionar evento de submit para o formulário de filtros para recarregar o calendário
         document.querySelector('.filter-form').addEventListener('submit', function(e) {
-
             calendar.refetchEvents();
         });
-
     });
 </script>
 @endsection

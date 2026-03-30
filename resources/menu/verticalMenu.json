@@ -89,6 +89,24 @@
           "url": "/admin/planned_shipments",
           "icon": "bx bx-package",
           "slug": "admin-planned-shipments"
+        },
+        {
+          "name": "Check-up de Veículos",
+          "url": "/driver/checkups/create",
+          "icon": "bx bx-clipboard",
+          "slug": "driver-checkups"
+        },
+        {
+          "name": "Relatório de Check-ups",
+          "url": "/admin/reports/checkups",
+          "icon": "bx bx-list-check",
+          "slug": "admin-checkups"
+        },
+        {
+          "name": "Itens do Checklist",
+          "url": "/admin/checklist-items",
+          "icon": "bx bx-task",
+          "slug": "admin-checklist-items"
         }
       ]
     },
@@ -108,6 +126,12 @@
           "icon": "bx bx-chart",
           "url": "/admin/assembly-dashboard",
           "slug": "admin-assembly-dashboard"
+        },
+        {
+          "name": "Espelho de Ponto",
+          "icon": "bx bx-time-five",
+          "url": "/admin/time-clock",
+          "slug": "admin-time-clock"
         }
       ]
     },

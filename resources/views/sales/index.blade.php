@@ -7,36 +7,43 @@
 @endsection
 
 @section('content')
+{{-- Page Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">{{ __('Vendas') }}</h4>
+        <p class="text-muted mb-0">{{ __('Gerenciamento de vendas e pedidos') }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <div class="btn-group me-2" role="group" aria-label="Visualização de Vendas">
+            <button type="button" class="btn btn-outline-primary btn-sm active" id="listViewBtn"><i class="bx bx-list-ul me-1"></i> {{ __('Lista') }}</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="kanbanViewBtn"><i class="bx bx-columns me-1"></i> {{ __('Kanban') }}</button>
+        </div>
+        <a href="{{ route('sales.export.excel') }}" class="btn btn-sm btn-outline-success"><i class="bx bx-file me-1"></i> {{ __('Excel') }}</a>
+        <a href="{{ route('sales.export.pdf') }}" class="btn btn-sm btn-outline-danger"><i class="bx bx-file me-1"></i> {{ __('PDF') }}</a>
+        <a href="{{ route('sales.create') }}" class="btn btn-sm btn-primary"><i class="bx bx-plus me-1"></i> {{ __('Nova Venda') }}</a>
+        <!-- Upload Button -->
+        <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#importSaleModal">
+            <i class="bx bx-import me-1"></i> {{ __('Importar Venda') }}
+        </a>
+    </div>
+</div>
+
 <div class="row mb-6 gy-6">
     <div class="col-xl">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ __('Vendas') }}</h5>
-                <div class="d-flex align-items-center">
-                    <div>
-                        <div style="margin-top: -10px;" class="btn-group me-2" role="group" aria-label="Visualização de Vendas">
-                            <button type="button" class="btn btn-outline-primary active" id="listViewBtn"><i class="bx bx-list-ul"></i> Lista</button>
-                            <button type="button" class="btn btn-outline-primary" id="kanbanViewBtn"><i class="bx bx-columns"></i> Kanban</button>
-                        </div>
-                        <a href="{{ route('sales.create') }}" class="btn btn-success mb-3"><i class="icon-base bx bx-plus icon-sm text-white"></i> {{ __('Adicionar Nova Venda') }}</a>
-                        <a href="{{ route('sales.export.excel') }}" class="btn btn-primary mb-3 ms-2"><i class="icon-base bx bxs-file-excel icon-sm text-white"></i> {{ __('Exportar Excel') }}</a>
-                        <a href="{{ route('sales.export.pdf') }}" class="btn btn-danger mb-3 ms-2"><i class="icon-base bx bxs-file-pdf icon-sm text-white"></i> {{ __('Exportar PDF') }}</a>
-                    </div>
-                </div>
-            </div>
+        <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <div id="listViewContent">
                     <div class="table-responsive text-nowrap">
                         <table class="table display" id="sales-table">
-                            <thead>
+                            <thead class="bg-light">
                                 <tr>
-                                    <th style="width: 5%;">{{ __('Pedido') }}</th>
-                                    <th>{{ __('Cliente') }}</th>
-                                    <th class="text-center">{{ __('Data da Venda') }}</th>
-                                    <th class="text-center">{{ __('Entrega Prevista') }}</th>
-                                    <th class="text-center">{{ __('Total') }}</th>
-                                    <th class="text-center">{{ __('Status') }}</th>
-                                    <th class="text-center" style="width: 5%;">{{ __('Ações') }}</th>
+                                    <th class="border-0 py-3 px-4">{{ __('Pedido') }}</th>
+                                    <th class="border-0 py-3">{{ __('Cliente') }}</th>
+                                    <th class="border-0 py-3 text-center">{{ __('Data da Venda') }}</th>
+                                    <th class="border-0 py-3 text-center">{{ __('Entrega Prevista') }}</th>
+                                    <th class="border-0 py-3 text-center">{{ __('Total') }}</th>
+                                    <th class="border-0 py-3 text-center">{{ __('Status') }}</th>
+                                    <th class="border-0 py-3 text-center" style="width: 5%;">{{ __('Ações') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="table-border-bottom-0">
@@ -49,9 +56,9 @@
                     <div class="kanban-container">
                         @foreach($orderStatuses as $status)
                             <div class="kanban-column">
-                                 <div class="card mb-3" style="box-shadow: none">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5 class="card-title mb-0">{{ $status->label() }}</h5>
+                                 <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3">
+                                        <h6 class="mb-0 fw-semibold">{{ $status->label() }}</h6>
                                         <i class="bx bx-dots-vertical-rounded cursor-pointer"></i>
                                     </div>
                                     <div class="card-body" style="padding: 3px">
@@ -66,22 +73,49 @@
                        
                     </div>
                 </div>
-                {{-- Removed existing pagination --}}
             </div>
         </div>
     </div>
-
 </div>
 @endsection
 
+@section('vendor-script')
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+@endsection
+
 @section('page-script')
+<style>
+/* DataTables Pagination - Bassani Theme */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #DE0802 !important;
+    border-color: #DE0802 !important;
+    color: #fff !important;
+    border-radius: 4px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #f8f9fa !important;
+    border-color: #DE0802 !important;
+    color: #DE0802 !important;
+    border-radius: 4px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    color: #6c757d !important;
+}
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #D2D4DA;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+</style>
 <script type="module">
     $(document).ready(function() {
         const canSeePrices = {{ (Auth::check() && Auth::user()->role_id == 1) ? 'true' : 'false' }};
         $('#sales-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('sales.data') }}", // We will create this route
+            ajax: "{{ route('sales.data') }}",
             columns: [
                 { data: 'sale_number', name: 'sale_number' },
                 { data: 'customer_name', name: 'customer_name' },
@@ -92,11 +126,12 @@
                     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data);
                 } },
                 { data: 'status', name: 'status', render: function(data, type, row) { return data; }, className: 'text-center' },
-                { data: 'actions', name: 'actions', orderable: false, searchable: false }
+                { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-center' }
             ],
             language: {
                 url: '{{ asset('assets/js/datatables/pt-BR.json') }}'
-            }
+            },
+            dom: "<'row align-items-center'<'col-sm-6'l><'col-sm-6'f>>rt<'row align-items-center'<'col-sm-6'i><'col-sm-6'p>>"
         });
 
         $('.delete-form').on('submit', function(e) {
@@ -107,8 +142,8 @@
                 text: "Você não poderá reverter isso!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#DE0802',
+                cancelButtonColor: '#1F2A44',
                 confirmButtonText: 'Sim, inativar!',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
@@ -117,178 +152,32 @@
                 }
             });
         });
-
-        // Lógica para alternar entre visualização de lista e Kanban
-        $('#listViewBtn').on('click', function() {
-            $('#listViewContent').show();
-            $('#kanbanViewContent').hide();
-            $('#listViewBtn').addClass('active');
-            $('#kanbanViewBtn').removeClass('active');
-            localStorage.setItem('salesViewPreference', 'list'); // Salva a preferência
-        });
-
-        $('#kanbanViewBtn').on('click', function() {
-            $('#listViewContent').hide();
-            $('#kanbanViewContent').show();
-            $('#kanbanViewBtn').addClass('active');
-            $('#listViewBtn').removeClass('active');
-            loadKanbanData(); // Função para carregar os dados do Kanban
-            localStorage.setItem('salesViewPreference', 'kanban'); // Salva a preferência
-        });
-
-        // Carregar a preferência do usuário ao carregar a página
-        const savedViewPreference = localStorage.getItem('salesViewPreference');
-        if (savedViewPreference === 'kanban') {
-            $('#kanbanViewBtn').click();
-        } else {
-            $('#listViewBtn').click();
-        }
-
-        function loadKanbanData() {
-            console.log("Carregando dados do Kanban...");
-            const statusColors = {
-                'In Production': 'bg-label-info',
-                'Open': 'bg-label-secondary',
-                'Delivered': 'bg-label-primary',
-                'In Transit': 'bg-label-warning',
-                'In Assembly': 'bg-label-success',
-                'Cancelled': 'bg-label-danger'
-            };
-            const orderStatusesValues = @json(collect($orderStatuses)->map(fn($status) => str_replace(' ', '-', $status->value)));
-            $.ajax({
-                url: "{{ route('sales.kanbanData') }}",
-                method: "GET",
-                success: function(data) {
-                    // Limpar colunas existentes
-                    $('.kanban-items').empty();
-
-                    // Agrupar vendas por status
-                    const salesByStatus = {};
-                    data.forEach(sale => {
-                        const statusKey = sale.order_status.replace(/ /g, '-'); // Substituir espaços por hífens
-                        if (!salesByStatus[statusKey]) {
-                            salesByStatus[statusKey] = [];
-                        }
-                        salesByStatus[statusKey].push(sale);
-                    });
-
-                    // Renderizar os cards nas colunas corretas
-                    orderStatusesValues.forEach(statusValue => {
-                        const column = $(`#kanban-column-${statusValue}`);
-                        if (column.length) {
-                            if (salesByStatus[statusValue] && salesByStatus[statusValue].length > 0) {
-                                salesByStatus[statusValue].forEach(sale => {
-                                    const card = `
-                                        <div class="card kanban-item mb-3" data-sale-id="${sale.id}" style="${(() => {
-                                            const today = new Date();
-                                            today.setHours(0, 0, 0, 0);
-                                            const deliveryDate = new Date(sale.expected_delivery_date);
-                                            deliveryDate.setHours(0, 0, 0, 0);
-                                            return (deliveryDate < today && sale.actual_delivery_date === null) ? 'background-color: #FFE0DB;' : '';
-                                        })()}">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <span class="badge ${statusColors[sale.order_status] || 'bg-label-primary'}">${sale.erp_code || sale.id}</span>
-                                                    <i class="bx bx-dots-vertical-rounded cursor-pointer dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                                    <ul class="dropdown-menu">
-                                                        <li>
-                                                            <a class="dropdown-item" href="/sales/${sale.id}">
-                                                                <i class="bx bx-show me-2"></i> Ver Detalhes
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item" href="/sales/${sale.id}/edit">
-                                                                <i class="bx bx-edit me-2"></i> Editar
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <form action="/sales/${sale.id}" method="POST" class="delete-form">
-                                                                <input type="hidden" name="_token" value="${$('meta[name=\"csrf-token\"]').attr('content')}">
-                                                                <input type="hidden" name="_method" value="DELETE">
-                                                                <button type="submit" class="dropdown-item text-danger">
-                                                                    <i class="bx bx-trash me-2"></i> Excluir
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <h6 class="card-title">${sale.customer.full_name || sale.customer.company_name}</h6>
-                                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                                    <div class="d-flex align-items-center">
-                                                        ${(() => {
-                                                            const today = new Date();
-                                                            today.setHours(0, 0, 0, 0);
-                                                            const deliveryDate = new Date(sale.expected_delivery_date);
-                                                            deliveryDate.setHours(0, 0, 0, 0);
-                                                            const badgeClass = (deliveryDate < today && sale.actual_delivery_date === null) ? 'bg-label-danger' : 'bg-label-warning';
-                                                            const formattedDate = deliveryDate.toLocaleDateString('pt-BR', {
-                                                                 day: '2-digit',
-                                                                 month: '2-digit',
-                                                                 year: 'numeric'
-                                                             });
-                                                             return `<span class="badge ${badgeClass}">${formattedDate}</span>`;
-                                                         })()}
-                                                    </div>
-                                                    <div class="avatar-group">
-                                                        ${sale.assigned_users && sale.assigned_users.length > 0 ?
-                                                            sale.assigned_users.map(user => `
-                                                                <div class="avatar avatar-sm pull-up" data-bs-toggle="tooltip" data-bs-placement="top" title="${user.name}">
-                                                                    <img src="${user.avatar_url || 'https://via.placeholder.com/150'}" alt="Avatar" class="rounded-circle">
-                                                                </div>
-                                                            `).join('')
-                                                            : ''
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                                    column.append(card);
-                                });
-                            } else {
-                                column.append('<p>Nenhum pedido neste status.</p>');
-                            }
-                        }
-                    });
-
-                    // Inicializar SortableJS para cada coluna Kanban
-                    orderStatusesValues.forEach(statusValue => {
-                        const kanbanColumn = document.getElementById(`kanban-column-${statusValue}`);
-                        if (kanbanColumn) {
-                            new Sortable(kanbanColumn, {
-                                group: 'kanban-sales',
-                                animation: 150,
-                                ghostClass: 'kanban-item-ghost',
-                                onEnd: function (evt) {
-                                    const saleId = $(evt.item).data('sale-id');
-                                    const newStatus = evt.to.id.replace('kanban-column-', '').replace(/-/g, ' ');
-                                    
-                                    $.ajax({
-                                        url: `/sales/${saleId}/update-status`,
-                                        method: 'PATCH',
-                                        data: {
-                                            _token: '{{ csrf_token() }}',
-                                            status: newStatus
-                                        },
-                                        success: function(response) {
-                                            console.log('Status atualizado com sucesso:', response);
-                                            // Opcional: recarregar dados do kanban ou atualizar apenas o card movido
-                                        },
-                                        error: function(error) {
-                                            console.error('Erro ao atualizar status:', error);
-                                            // Opcional: reverter a movimentação do card em caso de erro
-                                        }
-                                    });
-                                },
-                            });
-                        }
-                    });
-                },
-                error: function(error) {
-                    console.error("Erro ao carregar dados do Kanban:", error);
-                }
-            });
-        }
     });
 </script>
+
+<!-- Import Sale Modal -->
+<div class="modal fade" id="importSaleModal" tabindex="-1" aria-labelledby="importSaleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importSaleModalLabel">{{ __('Importar Venda de Pedido') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('sales.import') }}" method="POST" enctype="multipart/form-data" id="importSaleForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="saleFile" class="form-label">{{ __('Selecione o arquivo XLS') }}</label>
+                        <input class="form-control" type="file" id="saleFile" name="sale_file" accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/html" required>
+                        <div class="form-text">{{ __('O arquivo deve estar no formato XLS (HTML com charset utf-8-sig ou utf-16)') }}</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancelar') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('Importar') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection

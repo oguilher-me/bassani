@@ -468,9 +468,16 @@ class AssemblyScheduleController extends Controller
 
     public function dashboard(Request $request)
     {
+        $user = Auth::user();
         $start = $request->input('start_date');
         $end = $request->input('end_date');
+        
+        // If user is Montador, filter by their assembler_id automatically
         $assemblerId = $request->input('assembler_id');
+        if ($user->hasRole('Montador') && $user->assembler) {
+            $assemblerId = $user->assembler->id;
+        }
+        
         $statusFilter = $request->input('status');
         $city = $request->input('city');
 
